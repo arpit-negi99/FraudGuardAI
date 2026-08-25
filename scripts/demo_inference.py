@@ -1,0 +1,92 @@
+from __future__ import annotations
+
+import sys
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.data.load import load_labeled_data, read_config
+from src.data.split import chronological_split
+from src.inference.predict import FraudPredictor
+
+
+DEMO_ROWS = 5
+BATCH_SIZE = 100
+
+
+def main() -> None:
+    print("FraudGuard AI - Inference Demo")
+    print()
+
+    config_path = ROOT / "configs" / "config.yaml"
+    config = read_config(config_path)
+    merged_df, _, _ = load_labeled_data(config_path)
+    split_config = config["split"]
+    _, validation_df, _ = chronological_split(
+        merged_df,
+        train_ratio=split_config["train_ratio"],
+        validation_ratio=split_config["validation_ratio"],
+        test_ratio=split_config["test_ratio"],
+    )
+
+    demo_df = validation_df.head(DEMO_ROWS).copy()
+    offline_labels = demo_df["isFraud"].astype(int).tolist()
+    inference_df = demo_df.drop(columns=["isFraud"])
+
+    predictor = FraudPredictor(config_path=config_path)
+
+    started = time.perf_counter()
+    single_result = predictor.predict_transaction(
+        inference_df.iloc[[0]],
+        include_explanation=False,
+    )
+    single_without_shap_ms = (time.perf_counter() - started) * 1000
+
+    started = time.perf_counter()
+    single_with_shap = predictor.predict_transaction(
+        inference_df.iloc[[0]],
+        include_explanation=True,
+    )
+    single_with_shap_ms = (time.perf_counter() - started) * 1000
+
+    batch_df = validation_df.head(BATCH_SIZE).drop(columns=["isFraud"])
+    started = time.perf_counter()
+    batch_predictions = predictor.predict_batch(batch_df)
+    batch_ms = (time.perf_counter() - started) * 1000
+    batch_summary = predictor.summarize_batch(batch_predictions)
+
+    print("Single transaction")
+    print(f"TransactionID: {single_result['transaction_id']}")
+    print(f"Risk score: {single_result['risk_score']:.6f}")
+    print(f"Threshold: {single_result['threshold']:.2f}")
+    print(f"Decision: {single_result['decision']}")
+    print(f"Offline ground truth label: {offline_labels[0]}")
+    print()
+
+    print("Top model contributors")
+    contributors = single_with_shap.get("explanation", {}).get("top_risk_factors", [])
+    if contributors:
+        for item in contributors[:5]:
+            print(f"- {item['feature']}")
+    else:
+        print("- unavailable")
+    print()
+
+    print("Batch summary")
+    print(f"Rows: {batch_summary['transactions_scored']}")
+    print(f"Reviews: {batch_summary['review_count']}")
+    print(f"Allows: {batch_summary['allow_count']}")
+    print(f"Review rate: {batch_summary['review_rate']:.6f}")
+    print()
+
+    print("Latency")
+    print(f"Single prediction without SHAP: {single_without_shap_ms:.2f} ms")
+    print(f"Single prediction with SHAP: {single_with_shap_ms:.2f} ms")
+    print(f"Batch prediction ({len(batch_df)} rows): {batch_ms:.2f} ms")
+
+
+if __name__ == "__main__":
+    main()

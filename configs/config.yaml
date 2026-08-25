@@ -1,0 +1,32 @@
+data:
+  train_transaction: data/raw/train_transaction.csv
+  train_identity: data/raw/train_identity.csv
+  test_transaction: data/raw/test_transaction.csv
+  test_identity: data/raw/test_identity.csv
+  sample_submission: data/raw/sample_submission.csv
+
+split:
+  train_ratio: 0.70
+  validation_ratio: 0.15
+  test_ratio: 0.15
+
+preprocessing:
+  missing_column_threshold: 0.95
+
+target:
+  column: isFraud
+
+# Scenario assumptions only. IEEE-CIS does not provide merchant-specific review
+# labor cost, chargeback fee, margin, recovery, or currency-ground-truth fields.
+business_cost:
+  fraud_loss_multiplier: 1.0
+  review_cost_scenarios:
+    low: 1.0
+    medium: 5.0
+    high: 10.0
+
+# Demo/default operating policy only. Validation analysis showed threshold 0.60
+# kept review rate near 5% with precision 0.4308 and recall 0.6128.
+# This is not a final held-out-test production threshold.
+inference:
+  default_threshold: 0.60
