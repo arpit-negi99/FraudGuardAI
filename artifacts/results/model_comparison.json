@@ -1,0 +1,26 @@
+{
+  "evaluation_split": "validation",
+  "threshold": 0.5,
+  "majority_baseline": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.9656585498018763
+  },
+  "logistic_regression": {
+    "precision": 0.14911456451029997,
+    "recall": 0.678172255095332,
+    "f1": 0.24447472892101677,
+    "pr_auc": 0.4013834515974697,
+    "roc_auc": 0.8470321456732515,
+    "review_rate": 0.15618473487542475
+  },
+  "xgboost": {
+    "precision": 0.3350666233344166,
+    "recall": 0.6778435239973701,
+    "f1": 0.44845585036972596,
+    "pr_auc": 0.5710183686385969,
+    "roc_auc": 0.9186408652549604,
+    "review_rate": 0.06947313758029375
+  }
+}

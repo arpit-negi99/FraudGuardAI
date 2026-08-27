@@ -1,0 +1,273 @@
+{
+  "model": "XGBoost",
+  "explainer": "shap.TreeExplainer",
+  "evaluation_split": "validation",
+  "threshold_for_example_categories": 0.5,
+  "transformed_feature_count": 422,
+  "global_explanation_sample_size": 3000,
+  "runtime_seconds": 26.62090360000002,
+  "data": {
+    "transaction_rows": 590540,
+    "identity_rows": 144233,
+    "merged_rows": 590540,
+    "train_rows": 413378,
+    "validation_rows": 88581,
+    "held_out_test_rows_not_evaluated": 88581
+  },
+  "limitations": [
+    "SHAP values describe model attribution, not causality.",
+    "Anonymized IEEE-CIS features are reported by feature name only; no semantic meanings are invented.",
+    "Global SHAP importance uses a fixed validation sample for runtime control.",
+    "Threshold 0.50 is used only to select example confusion-matrix categories."
+  ],
+  "examples": {
+    "high_risk_true_positive": {
+      "TransactionID": 3481071,
+      "actual_label": 1,
+      "fraud_probability": 0.9999353885650635,
+      "prediction_at_threshold_0_50": 1,
+      "policy_decision_at_threshold_0_50": "REVIEW",
+      "top_positive_shap_contributors": [
+        {
+          "feature": "C1",
+          "value": 340.0,
+          "shap_value": 1.7025200128555298
+        },
+        {
+          "feature": "V258",
+          "value": 10.0,
+          "shap_value": 1.4095336198806763
+        },
+        {
+          "feature": "V45",
+          "value": 8.0,
+          "shap_value": 0.6247836947441101
+        },
+        {
+          "feature": "id_09",
+          "value": 4.0,
+          "shap_value": 0.6069973707199097
+        },
+        {
+          "feature": "V87",
+          "value": 7.0,
+          "shap_value": 0.5966233015060425
+        }
+      ],
+      "top_negative_shap_contributors": [
+        {
+          "feature": "C14",
+          "value": 12.0,
+          "shap_value": -0.5132765769958496
+        },
+        {
+          "feature": "C13",
+          "value": 13.0,
+          "shap_value": -0.33126121759414673
+        },
+        {
+          "feature": "D13",
+          "value": 8.0,
+          "shap_value": -0.2471495270729065
+        },
+        {
+          "feature": "TransactionAmt",
+          "value": 44.26599884033203,
+          "shap_value": -0.10862049460411072
+        },
+        {
+          "feature": "card6",
+          "value": 3.0,
+          "shap_value": -0.09637652337551117
+        }
+      ],
+      "formatted_explanation": "Fraud risk score: 100.0%\nPolicy threshold: 0.50\nPolicy decision: REVIEW\n\nMain factors that contributed to a higher model score:\n- C1\n- V258\n- V45\n- id_09\n- V87\n\nFactors that contributed to a lower model score:\n- C14\n- C13\n- D13\n- TransactionAmt\n- card6"
+    },
+    "high_risk_false_positive": {
+      "TransactionID": 3456622,
+      "actual_label": 0,
+      "fraud_probability": 0.998786985874176,
+      "prediction_at_threshold_0_50": 1,
+      "policy_decision_at_threshold_0_50": "REVIEW",
+      "top_positive_shap_contributors": [
+        {
+          "feature": "V258",
+          "value": 4.0,
+          "shap_value": 1.4930778741836548
+        },
+        {
+          "feature": "id_04",
+          "value": -11.0,
+          "shap_value": 1.1402050256729126
+        },
+        {
+          "feature": "V87",
+          "value": 4.0,
+          "shap_value": 0.9364252686500549
+        },
+        {
+          "feature": "C14",
+          "value": 0.0,
+          "shap_value": 0.7861008048057556
+        },
+        {
+          "feature": "C1",
+          "value": 5.0,
+          "shap_value": 0.5282703042030334
+        }
+      ],
+      "top_negative_shap_contributors": [
+        {
+          "feature": "card3",
+          "value": 133.0,
+          "shap_value": -0.2810826003551483
+        },
+        {
+          "feature": "card2",
+          "value": 555.0,
+          "shap_value": -0.26724517345428467
+        },
+        {
+          "feature": "card1",
+          "value": 17697.0,
+          "shap_value": -0.2446492314338684
+        },
+        {
+          "feature": "V55",
+          "value": 2.0,
+          "shap_value": -0.16555070877075195
+        },
+        {
+          "feature": "card6",
+          "value": 3.0,
+          "shap_value": -0.16322043538093567
+        }
+      ],
+      "formatted_explanation": "Fraud risk score: 99.9%\nPolicy threshold: 0.50\nPolicy decision: REVIEW\n\nMain factors that contributed to a higher model score:\n- V258\n- id_04\n- V87\n- C14\n- C1\n\nFactors that contributed to a lower model score:\n- card3\n- card2\n- card1\n- V55\n- card6"
+    },
+    "missed_fraud_false_negative": {
+      "TransactionID": 3481470,
+      "actual_label": 1,
+      "fraud_probability": 0.003222017316147685,
+      "prediction_at_threshold_0_50": 0,
+      "policy_decision_at_threshold_0_50": "ALLOW",
+      "top_positive_shap_contributors": [
+        {
+          "feature": "V258",
+          "value": 2.0,
+          "shap_value": 0.6910318732261658
+        },
+        {
+          "feature": "C8",
+          "value": 6.0,
+          "shap_value": 0.3074853718280792
+        },
+        {
+          "feature": "id_02",
+          "value": 474.0,
+          "shap_value": 0.24480779469013214
+        },
+        {
+          "feature": "P_emaildomain",
+          "value": 0.0,
+          "shap_value": 0.21185487508773804
+        },
+        {
+          "feature": "V201",
+          "value": 2.0,
+          "shap_value": 0.17461656033992767
+        }
+      ],
+      "top_negative_shap_contributors": [
+        {
+          "feature": "card1",
+          "value": 18227.0,
+          "shap_value": -0.698500394821167
+        },
+        {
+          "feature": "card2",
+          "value": 583.0,
+          "shap_value": -0.5248289108276367
+        },
+        {
+          "feature": "id_31",
+          "value": 76.0,
+          "shap_value": -0.4763358533382416
+        },
+        {
+          "feature": "addr1",
+          "value": 181.0,
+          "shap_value": -0.3892814517021179
+        },
+        {
+          "feature": "D1",
+          "value": 153.0,
+          "shap_value": -0.37891995906829834
+        }
+      ],
+      "formatted_explanation": "Fraud risk score: 0.3%\nPolicy threshold: 0.50\nPolicy decision: ALLOW\n\nMain factors that contributed to a higher model score:\n- V258\n- C8\n- id_02\n- P_emaildomain\n- V201\n\nFactors that contributed to a lower model score:\n- card1\n- card2\n- id_31\n- addr1\n- D1"
+    },
+    "clearly_legitimate_true_negative": {
+      "TransactionID": 3458851,
+      "actual_label": 0,
+      "fraud_probability": 1.471018185839057e-05,
+      "prediction_at_threshold_0_50": 0,
+      "policy_decision_at_threshold_0_50": "ALLOW",
+      "top_positive_shap_contributors": [
+        {
+          "feature": "V258",
+          "value": 2.0,
+          "shap_value": 0.1898055374622345
+        },
+        {
+          "feature": "V160",
+          "value": 335.0,
+          "shap_value": 0.12953390181064606
+        },
+        {
+          "feature": "V335",
+          "value": 585.0,
+          "shap_value": 0.125115305185318
+        },
+        {
+          "feature": "D9",
+          "value": 0.9583330154418945,
+          "shap_value": 0.12436169385910034
+        },
+        {
+          "feature": "DeviceType",
+          "value": 2.0,
+          "shap_value": 0.10339896380901337
+        }
+      ],
+      "top_negative_shap_contributors": [
+        {
+          "feature": "C3",
+          "value": 1.0,
+          "shap_value": -1.705086350440979
+        },
+        {
+          "feature": "C13",
+          "value": 41.0,
+          "shap_value": -0.9095196723937988
+        },
+        {
+          "feature": "D1",
+          "value": 566.0,
+          "shap_value": -0.8675621747970581
+        },
+        {
+          "feature": "D2",
+          "value": 566.0,
+          "shap_value": -0.7925829887390137
+        },
+        {
+          "feature": "D13",
+          "value": 193.0,
+          "shap_value": -0.7319840788841248
+        }
+      ],
+      "formatted_explanation": "Fraud risk score: 0.0%\nPolicy threshold: 0.50\nPolicy decision: ALLOW\n\nMain factors that contributed to a higher model score:\n- V258\n- V160\n- V335\n- D9\n- DeviceType\n\nFactors that contributed to a lower model score:\n- C3\n- C13\n- D1\n- D2\n- D13"
+    }
+  }
+}

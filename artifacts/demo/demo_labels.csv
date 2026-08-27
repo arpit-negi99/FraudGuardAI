@@ -1,0 +1,15 @@
+TransactionID,isFraud,demo_case
+3481470,1,False negative
+3456622,0,False positive
+3481071,1,High-risk true positive
+3458851,0,Low-risk legitimate transaction
+3400378,0,
+3400379,1,
+3400380,0,
+3400381,0,
+3400382,0,
+3400383,0,
+3400384,0,
+3400385,0,
+3400386,0,
+3400387,0,

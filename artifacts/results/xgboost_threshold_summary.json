@@ -1,0 +1,79 @@
+{
+  "evaluation_split": "validation",
+  "threshold_grid": {
+    "min": 0.01,
+    "max": 0.99,
+    "count": 99
+  },
+  "metrics_at_threshold_0_50": {
+    "threshold": 0.5,
+    "precision": 0.3350666233344166,
+    "recall": 0.6778435239973701,
+    "f1": 0.44845585036972596,
+    "true_positive": 2062,
+    "false_positive": 4092,
+    "true_negative": 81447,
+    "false_negative": 980,
+    "review_rate": 0.06947313758029375
+  },
+  "highest_f1": {
+    "threshold": 0.79,
+    "precision": 0.6559888579387186,
+    "recall": 0.46449704142011833,
+    "f1": 0.5438799076212472,
+    "true_positive": 1413,
+    "false_positive": 741,
+    "true_negative": 84798,
+    "false_negative": 1629,
+    "review_rate": 0.024316727063365733
+  },
+  "highest_precision_recall_at_least_0_60": {
+    "threshold": 0.61,
+    "precision": 0.4410782442748092,
+    "recall": 0.6078238001314924,
+    "f1": 0.5111971246889687,
+    "true_positive": 1849,
+    "false_positive": 2343,
+    "true_negative": 83196,
+    "false_negative": 1193,
+    "review_rate": 0.047323918221740556
+  },
+  "highest_precision_recall_at_least_0_70": {
+    "threshold": 0.46,
+    "precision": 0.30045095828635854,
+    "recall": 0.7008547008547008,
+    "f1": 0.4205957782600118,
+    "true_positive": 2132,
+    "false_positive": 4964,
+    "true_negative": 80575,
+    "false_negative": 910,
+    "review_rate": 0.08010747225703028
+  },
+  "lowest_review_rate_recall_at_least_0_60": {
+    "threshold": 0.61,
+    "precision": 0.4410782442748092,
+    "recall": 0.6078238001314924,
+    "f1": 0.5111971246889687,
+    "true_positive": 1849,
+    "false_positive": 2343,
+    "true_negative": 83196,
+    "false_negative": 1193,
+    "review_rate": 0.047323918221740556
+  },
+  "model": "XGBoost",
+  "probability_source": "Recomputed from saved XGBoost model and train-fitted preprocessor.",
+  "data": {
+    "transaction_rows": 590540,
+    "identity_rows": 144233,
+    "merged_rows": 590540,
+    "train_rows": 413378,
+    "validation_rows": 88581,
+    "held_out_test_rows_not_evaluated": 88581
+  },
+  "notes": [
+    "Threshold analysis uses validation labels only.",
+    "No final production threshold selected.",
+    "No business-cost optimization calculated.",
+    "Held-out test split was not evaluated."
+  ]
+}

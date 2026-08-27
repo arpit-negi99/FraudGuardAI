@@ -1,0 +1,280 @@
+{
+  "model": "XGBoost",
+  "model_artifact": "artifacts\\models\\xgboost_model.json",
+  "preprocessor_artifact": "artifacts\\preprocessors\\preprocessor.joblib",
+  "evaluation_split": "chronological_held_out_test",
+  "frozen_threshold": 0.6,
+  "decision_rule": "risk_score >= 0.60 => REVIEW; otherwise ALLOW",
+  "created_at_utc": "2026-08-26T15:45:32.064172+00:00",
+  "data": {
+    "transaction_rows": 590540,
+    "identity_rows": 144233,
+    "merged_rows": 590540,
+    "train_rows": 413378,
+    "validation_rows": 88581,
+    "test_rows": 88581,
+    "train_fraud_rate": 0.03516878014795175,
+    "validation_fraud_rate": 0.03434145019812375,
+    "test_fraud_rate": 0.03480430340592226
+  },
+  "preprocessing": {
+    "frozen_feature_count": 422,
+    "numeric_columns": 393,
+    "categorical_columns": 29,
+    "dropped_high_missing_columns": 9,
+    "excluded_columns": [
+      "isFraud",
+      "TransactionID",
+      "TransactionDT"
+    ]
+  },
+  "metrics": {
+    "threshold": 0.6,
+    "precision": 0.3640176137555043,
+    "recall": 0.5630879013947454,
+    "f1": 0.4421803362200713,
+    "pr_auc": 0.5149312721760272,
+    "roc_auc": 0.8912468979230473,
+    "accuracy": 0.9505537304839639,
+    "true_positive": 1736,
+    "false_positive": 3033,
+    "true_negative": 82465,
+    "false_negative": 1347,
+    "review_rate": 0.05383773043880742
+  },
+  "majority_baseline": {
+    "model": "MajorityClassLegitimate",
+    "accuracy": 0.9651956965940778,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "logistic_regression_comparison": {
+    "model": "Logistic Regression",
+    "threshold": 0.5,
+    "precision": 0.12033936146461263,
+    "recall": 0.6993188452805709,
+    "f1": 0.20534311157674176,
+    "pr_auc": 0.16796005016836876,
+    "roc_auc": 0.8221142301067837,
+    "accuracy": 0.8116187444260056,
+    "true_positive": 2156,
+    "false_positive": 15760,
+    "true_negative": 69738,
+    "false_negative": 927,
+    "review_rate": 0.20225556270532055
+  },
+  "validation_at_threshold_0_60": {
+    "threshold": 0.6,
+    "precision": 0.43078345273861796,
+    "recall": 0.6127547666009204,
+    "f1": 0.5059031076129733,
+    "pr_auc": 0.5710183686385969,
+    "roc_auc": 0.9186408652549604,
+    "review_rate": 0.048847947076686875,
+    "true_positive": 1864,
+    "false_positive": 2463,
+    "true_negative": 83076,
+    "false_negative": 1178
+  },
+  "validation_vs_test": {
+    "model": "XGBoost",
+    "threshold": 0.6,
+    "rows": [
+      {
+        "metric": "precision",
+        "validation": 0.43078345273861796,
+        "held_out_test": 0.3640176137555043,
+        "difference_test_minus_validation": -0.06676583898311367
+      },
+      {
+        "metric": "recall",
+        "validation": 0.6127547666009204,
+        "held_out_test": 0.5630879013947454,
+        "difference_test_minus_validation": -0.049666865206175026
+      },
+      {
+        "metric": "f1",
+        "validation": 0.5059031076129733,
+        "held_out_test": 0.4421803362200713,
+        "difference_test_minus_validation": -0.063722771392902
+      },
+      {
+        "metric": "pr_auc",
+        "validation": 0.5710183686385969,
+        "held_out_test": 0.5149312721760272,
+        "difference_test_minus_validation": -0.05608709646256971
+      },
+      {
+        "metric": "roc_auc",
+        "validation": 0.9186408652549604,
+        "held_out_test": 0.8912468979230473,
+        "difference_test_minus_validation": -0.027393967331913016
+      },
+      {
+        "metric": "review_rate",
+        "validation": 0.048847947076686875,
+        "held_out_test": 0.05383773043880742,
+        "difference_test_minus_validation": 0.0049897833621205465
+      }
+    ],
+    "note": "Validation threshold metrics were selected before held-out test evaluation."
+  },
+  "error_analysis": {
+    "note": "Descriptive counts only; anonymized IEEE-CIS feature values are not interpreted.",
+    "highest_risk_false_positive_count_reviewed": 50,
+    "lowest_risk_false_negative_count_reviewed": 50,
+    "highest_risk_false_positive_examples": [
+      {
+        "TransactionID": 3569342,
+        "TransactionAmt": 78.387,
+        "risk_score": 0.9996634721755981
+      },
+      {
+        "TransactionID": 3569645,
+        "TransactionAmt": 130.645,
+        "risk_score": 0.9995734095573425
+      },
+      {
+        "TransactionID": 3569699,
+        "TransactionAmt": 130.645,
+        "risk_score": 0.9993742108345032
+      },
+      {
+        "TransactionID": 3523876,
+        "TransactionAmt": 20.903,
+        "risk_score": 0.9991638660430908
+      },
+      {
+        "TransactionID": 3523865,
+        "TransactionAmt": 20.903,
+        "risk_score": 0.9990906715393066
+      },
+      {
+        "TransactionID": 3523870,
+        "TransactionAmt": 20.903,
+        "risk_score": 0.9988517761230469
+      },
+      {
+        "TransactionID": 3523861,
+        "TransactionAmt": 20.903,
+        "risk_score": 0.9987597465515137
+      },
+      {
+        "TransactionID": 3569749,
+        "TransactionAmt": 128.001,
+        "risk_score": 0.9986961483955383
+      },
+      {
+        "TransactionID": 3569682,
+        "TransactionAmt": 130.645,
+        "risk_score": 0.9985033273696899
+      },
+      {
+        "TransactionID": 3569331,
+        "TransactionAmt": 78.387,
+        "risk_score": 0.99847811460495
+      }
+    ],
+    "lowest_risk_false_negative_examples": [
+      {
+        "TransactionID": 3546602,
+        "TransactionAmt": 25.0,
+        "risk_score": 0.0009650076390244067
+      },
+      {
+        "TransactionID": 3576671,
+        "TransactionAmt": 10.0,
+        "risk_score": 0.001223552506417036
+      },
+      {
+        "TransactionID": 3573990,
+        "TransactionAmt": 10.0,
+        "risk_score": 0.0013862454798072577
+      },
+      {
+        "TransactionID": 3554417,
+        "TransactionAmt": 10.0,
+        "risk_score": 0.001457679201848805
+      },
+      {
+        "TransactionID": 3542433,
+        "TransactionAmt": 15.0,
+        "risk_score": 0.001737626502290368
+      },
+      {
+        "TransactionID": 3536159,
+        "TransactionAmt": 20.0,
+        "risk_score": 0.0017937424127012491
+      },
+      {
+        "TransactionID": 3571428,
+        "TransactionAmt": 15.0,
+        "risk_score": 0.0019892363343387842
+      },
+      {
+        "TransactionID": 3530131,
+        "TransactionAmt": 200.0,
+        "risk_score": 0.0027898361440747976
+      },
+      {
+        "TransactionID": 3534833,
+        "TransactionAmt": 57.95,
+        "risk_score": 0.0030575552955269814
+      },
+      {
+        "TransactionID": 3530070,
+        "TransactionAmt": 200.0,
+        "risk_score": 0.0033066091127693653
+      }
+    ],
+    "highest_risk_false_positive_patterns": {
+      "ProductCD": {
+        "C": 50
+      },
+      "card4": {
+        "visa": 32,
+        "mastercard": 18
+      },
+      "card6": {
+        "credit": 40,
+        "debit": 10
+      },
+      "DeviceType": {
+        "mobile": 36,
+        "desktop": 14
+      }
+    },
+    "lowest_risk_false_negative_patterns": {
+      "ProductCD": {
+        "W": 24,
+        "S": 14,
+        "R": 6,
+        "H": 6
+      },
+      "card4": {
+        "visa": 27,
+        "mastercard": 12,
+        "discover": 11
+      },
+      "card6": {
+        "credit": 28,
+        "debit": 22
+      },
+      "DeviceType": {
+        "__MISSING__": 24,
+        "desktop": 21,
+        "mobile": 5
+      }
+    }
+  },
+  "leakage_protection": {
+    "model_loaded_from_artifact": true,
+    "preprocessor_loaded_from_artifact": true,
+    "threshold_fixed_before_test": true,
+    "threshold_optimization_on_test": false,
+    "hyperparameter_tuning_on_test": false,
+    "feature_selection_on_test": false,
+    "kaggle_unlabeled_test_used": false
+  }
+}

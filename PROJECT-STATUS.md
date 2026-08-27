@@ -13,7 +13,7 @@ The system should detect fraudulent transactions while measuring both:
 
 ## Current Stage
 
-Demo Polished — Ready to Freeze Policy
+Deployment Hardened - Ready for Final Demo Packaging
 
 ## Completed Before This Task
 
@@ -289,7 +289,7 @@ Streamlit threshold slider verification: slider reran at threshold 0.79 with 0 e
 Streamlit tests: 95 passed, 0 failed, 0 skipped
 Streamlit dependency installed: streamlit 1.62.0
 Streamlit UI support tests added: 8 passed
-Streamlit held-out test evaluation: not performed
+Streamlit held-out test evaluation: not performed during UI implementation
 
 UI polish completed: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, and Model & Methodology refined
 UI polish tests: 103 passed, 0 failed, 0 skipped
@@ -302,13 +302,13 @@ Second visual polish pass completed after review feedback that the UI looked too
 Second visual polish local app verification: HTTP 200 from `streamlit run app.py`
 Second visual polish tests: 103 passed, 0 failed, 0 skipped
 
-Selected threshold: TODO
-Review rate: TODO
-False positives: TODO
-Missed fraud cases: TODO
+Selected threshold: 0.60
+Review rate: 0.053838
+False positives: 3033
+Missed fraud cases: 1347
 
-Estimated false-positive cost: TODO
-Estimated missed-fraud cost: TODO
+Estimated false-positive cost: 15165.00 under medium review-cost scenario
+Estimated missed-fraud cost: 216620.97 under fraud loss multiplier 1.0
 ```
 
 ## Completed
@@ -395,7 +395,7 @@ UI polish implementation note:
 * Batch Analysis and Risk Policy Lab now use styled cards for summary and policy metrics.
 * Model & Methodology now uses compact summary cards instead of a plain text list.
 * XGBoost model, preprocessing, feature set, Logistic Regression, validation probabilities, threshold analysis, cost analysis, SHAP calculations, and inference output semantics were not changed.
-* Held-out test split remains untouched.
+* Held-out test split remained untouched during UI polish.
 
 Streamlit pages/features completed:
 
@@ -414,7 +414,7 @@ Streamlit implementation note:
 * The app imports and calls the existing inference layer instead of duplicating ML logic.
 * The app reads existing validation result artifacts for metrics, threshold analysis, cost scenarios, and SHAP global importance.
 * No model retraining, preprocessing refit, hyperparameter tuning, or held-out test evaluation is triggered by the UI.
-* Default threshold 0.60 is labeled as validation-derived demo/default policy, not a final production threshold.
+* Default threshold 0.60 is the frozen demo policy selected from validation analysis before final held-out evaluation.
 * Cost values are labeled as modeled cost units, not actual merchant savings.
 * Batch precision/recall is not calculated for uploaded CSVs because production-style input normally has no labels.
 * Streamlit is cached with `st.cache_resource` for the predictor and `st.cache_data` for static artifacts and validation examples.
@@ -423,8 +423,8 @@ Streamlit implementation note:
 * Local app test harness verified the scored CSV download button rendered.
 * Local app test harness verified threshold slider rerun at 0.79 with 0 exceptions.
 * Streamlit install upgraded `protobuf` to 7.36.0 and pip reported conflicts with unrelated installed Google/MediaPipe packages in the global Python environment.
-* The existing preprocessor artifact emits a scikit-learn version warning when loaded because it was serialized with scikit-learn 1.9.0 and this environment has 1.5.2.
-* Held-out test split remains untouched.
+* The preprocessor artifact originally emitted a scikit-learn version warning before deployment hardening because it was serialized with scikit-learn 1.9.0 and the runtime had 1.5.2.
+* Held-out test split remained untouched during Streamlit implementation.
 
 Inference artifacts reused:
 
@@ -521,6 +521,112 @@ Artifacts produced:
 * `artifacts/preprocessors/preprocessor.joblib`
 * `artifacts/preprocessors/preprocessing_metadata.json`
 
+## Final Frozen System
+
+Model: XGBoost
+
+Model artifact: `artifacts/models/xgboost_model.json`
+
+Preprocessor artifact: `artifacts/preprocessors/preprocessor.joblib`
+
+Features: 422
+
+Threshold: 0.60
+
+Decision: ALLOW / REVIEW
+
+Freeze warning:
+
+`The held-out test set has been opened. No future threshold/model/feature tuning should use these test results as optimization feedback.`
+
+Deployment hardening note:
+
+* Runtime dependency pins are recorded in `requirements-lock.txt`.
+* scikit-learn runtime aligned to 1.9.0 to match the frozen preprocessor artifact.
+* Standard app/demo inference now uses small packaged demo artifacts instead of loading raw IEEE-CIS CSVs.
+* No API keys or external model services are required.
+
+## Final Held-Out Test Metrics
+
+```text
+Test rows: 88581
+Test fraud rate: 0.034804
+
+Precision: 0.364018
+Recall: 0.563088
+F1: 0.442180
+PR-AUC: 0.514931
+ROC-AUC: 0.891247
+Accuracy: 0.950554
+TP: 1736
+FP: 3033
+TN: 82465
+FN: 1347
+Review rate: 0.053838
+```
+
+## Generalization
+
+Validation vs held-out test at frozen threshold 0.60:
+
+```text
+Metric | Validation | Held-out test | Test - validation
+precision: 0.430783 | 0.364018 | -0.066766
+recall: 0.612755 | 0.563088 | -0.049667
+f1: 0.505903 | 0.442180 | -0.063723
+pr_auc: 0.571018 | 0.514931 | -0.056087
+roc_auc: 0.918641 | 0.891247 | -0.027394
+review_rate: 0.048848 | 0.053838 | 0.004990
+```
+
+## Final Cost Simulation
+
+Held-out modeled cost simulation only. Threshold 0.60 was not optimized on test costs.
+
+```text
+Low review cost total: 219653.97
+Medium review cost total: 231785.97
+High review cost total: 246950.97
+```
+
+Final held-out evaluation artifacts produced:
+
+* `artifacts/results/final_test_metrics.json`
+* `artifacts/results/final_validation_vs_test.json`
+* `artifacts/results/final_validation_vs_test.csv`
+* `artifacts/results/final_test_cost_simulation.json`
+* `artifacts/results/final_confusion_matrix.png`
+* `artifacts/results/final_validation_vs_test.png`
+* `artifacts/results/final_precision_recall_curve.png`
+
+## Deployment Hardening Verification
+
+```text
+Python version: 3.12.0
+pandas version: 3.0.5
+numpy version: 2.5.2
+scikit-learn version: 1.9.0
+XGBoost version: 3.4.1
+SHAP version: 0.52.0
+Streamlit version: 1.62.0
+joblib version: 1.5.3
+PyYAML version: 6.0.3
+matplotlib version: 3.11.1
+pytest version: 9.1.1
+
+project .venv pip check: no broken requirements found
+global Python pip check: failed due to unrelated globally installed Google/MediaPipe/spaCy-side package conflicts with protobuf/numpy; FraudGuard .venv is clean.
+project .venv pytest: 117 passed, 0 failed, 0 skipped
+demo_inference.py: succeeded
+Streamlit HTTP startup: 200
+Streamlit page harness: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, and Model & Methodology each ran with 0 exceptions
+Preprocessor sklearn version warning: absent after runtime alignment
+Raw IEEE-CIS data required for standard app/demo startup: no
+External API keys required: no
+Absolute local paths required by app/demo: no
+Required deployment artifacts present: yes
+```
+
 ## Next Action
 
-Freeze the existing XGBoost model, preprocessing, features, and threshold 0.60, then perform final held-out evaluation once.
+Ready for final demo script, presentation, and submission packaging.

@@ -10,9 +10,21 @@ data/processed/*
 artifacts/models/*
 artifacts/preprocessors/*
 artifacts/results/*
+artifacts/demo/*
 
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !artifacts/models/.gitkeep
 !artifacts/preprocessors/.gitkeep
 !artifacts/results/.gitkeep
+!artifacts/models/xgboost_model.json
+!artifacts/models/logistic_regression.joblib
+!artifacts/models/baseline_scaler.joblib
+!artifacts/preprocessors/preprocessor.joblib
+!artifacts/preprocessors/preprocessing_metadata.json
+!artifacts/results/*.json
+!artifacts/results/*.csv
+!artifacts/results/*.png
+!artifacts/demo/.gitkeep
+!artifacts/demo/demo_transactions.csv
+!artifacts/demo/demo_labels.csv

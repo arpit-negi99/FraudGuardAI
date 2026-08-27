@@ -4,39 +4,32 @@ import sys
 import time
 from pathlib import Path
 
+import pandas as pd
+
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.data.load import load_labeled_data, read_config
-from src.data.split import chronological_split
 from src.inference.predict import FraudPredictor
 
 
 DEMO_ROWS = 5
 BATCH_SIZE = 100
+DEMO_TRANSACTIONS_PATH = ROOT / "artifacts" / "demo" / "demo_transactions.csv"
+DEMO_LABELS_PATH = ROOT / "artifacts" / "demo" / "demo_labels.csv"
 
 
 def main() -> None:
     print("FraudGuard AI - Inference Demo")
     print()
 
-    config_path = ROOT / "configs" / "config.yaml"
-    config = read_config(config_path)
-    merged_df, _, _ = load_labeled_data(config_path)
-    split_config = config["split"]
-    _, validation_df, _ = chronological_split(
-        merged_df,
-        train_ratio=split_config["train_ratio"],
-        validation_ratio=split_config["validation_ratio"],
-        test_ratio=split_config["test_ratio"],
-    )
-
-    demo_df = validation_df.head(DEMO_ROWS).copy()
+    transactions = pd.read_csv(DEMO_TRANSACTIONS_PATH)
+    labels = pd.read_csv(DEMO_LABELS_PATH)
+    demo_df = transactions.merge(labels, how="left", on="TransactionID", validate="one_to_one")
     offline_labels = demo_df["isFraud"].astype(int).tolist()
-    inference_df = demo_df.drop(columns=["isFraud"])
+    inference_df = demo_df.drop(columns=["isFraud", "demo_case"], errors="ignore")
 
-    predictor = FraudPredictor(config_path=config_path)
+    predictor = FraudPredictor(config_path=ROOT / "configs" / "config.yaml")
 
     started = time.perf_counter()
     single_result = predictor.predict_transaction(
@@ -52,7 +45,7 @@ def main() -> None:
     )
     single_with_shap_ms = (time.perf_counter() - started) * 1000
 
-    batch_df = validation_df.head(BATCH_SIZE).drop(columns=["isFraud"])
+    batch_df = inference_df.head(BATCH_SIZE).copy()
     started = time.perf_counter()
     batch_predictions = predictor.predict_batch(batch_df)
     batch_ms = (time.perf_counter() - started) * 1000

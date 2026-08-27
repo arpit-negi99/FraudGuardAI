@@ -12,12 +12,25 @@ ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.data.load import load_labeled_data, read_config
-from src.data.split import chronological_split
 from src.inference.predict import ArtifactLoadError, FraudPredictor, InferenceError
 
 
 DEFAULT_THRESHOLD = 0.60
+DEMO_TRANSACTIONS_PATH = Path("artifacts/demo/demo_transactions.csv")
+DEMO_LABELS_PATH = Path("artifacts/demo/demo_labels.csv")
+REQUIRED_DEPLOYMENT_ARTIFACTS = (
+    Path("artifacts/models/xgboost_model.json"),
+    Path("artifacts/preprocessors/preprocessor.joblib"),
+    Path("artifacts/preprocessors/preprocessing_metadata.json"),
+    Path("artifacts/results/xgboost_validation_metrics.json"),
+    Path("artifacts/results/model_comparison.json"),
+    Path("artifacts/results/xgboost_threshold_analysis.csv"),
+    Path("artifacts/results/xgboost_threshold_summary.json"),
+    Path("artifacts/results/xgboost_cost_summary.json"),
+    Path("artifacts/results/shap_global_importance.csv"),
+    DEMO_TRANSACTIONS_PATH,
+    DEMO_LABELS_PATH,
+)
 DEMO_EXAMPLE_IDS = {
     "High-risk true positive": 3481071,
     "False positive": 3456622,
@@ -211,6 +224,21 @@ def load_csv_artifact(path: str | Path) -> pd.DataFrame:
     return pd.read_csv(artifact_path)
 
 
+def missing_deployment_artifacts(root: Path = ROOT) -> list[Path]:
+    """Return required deployment artifacts that are absent from the local package."""
+    return [path for path in REQUIRED_DEPLOYMENT_ARTIFACTS if not (root / path).exists()]
+
+
+def render_startup_health_check() -> bool:
+    missing = missing_deployment_artifacts()
+    if not missing:
+        return True
+    st.error("FraudGuard cannot start because required frozen artifacts are missing.")
+    st.code("\n".join(str(path) for path in missing), language="text")
+    st.info("Restore the frozen artifacts before launching the demo. The app will not retrain automatically.")
+    return False
+
+
 def nearest_threshold_metrics(threshold_table: pd.DataFrame, threshold: float) -> dict[str, Any]:
     if threshold_table.empty:
         raise ValueError("Threshold table is empty.")
@@ -354,37 +382,17 @@ def get_csv_artifact(path: str) -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def get_validation_examples() -> pd.DataFrame:
-    config = read_config(ROOT / "configs" / "config.yaml")
-    merged_df, _, _ = load_labeled_data(ROOT / "configs" / "config.yaml")
-    split_config = config["split"]
-    splits = chronological_split(
-        merged_df,
-        train_ratio=split_config["train_ratio"],
-        validation_ratio=split_config["validation_ratio"],
-        test_ratio=split_config["test_ratio"],
-    )
-    validation_df = splits[1]
-    examples = validation_df[
-        validation_df["TransactionID"].isin(DEMO_EXAMPLE_IDS.values())
-    ].copy()
-    label_lookup = {value: key for key, value in DEMO_EXAMPLE_IDS.items()}
-    examples["demo_case"] = examples["TransactionID"].map(label_lookup)
+    transactions = load_csv_artifact(ROOT / DEMO_TRANSACTIONS_PATH)
+    labels = load_csv_artifact(ROOT / DEMO_LABELS_PATH)
+    examples = transactions.merge(labels, how="inner", on="TransactionID", validate="one_to_one")
+    examples = examples[examples["demo_case"].notna()].copy()
     examples = examples.sort_values("demo_case", kind="mergesort")
     return examples
 
 
 @st.cache_data(show_spinner=False)
 def get_batch_sample() -> pd.DataFrame:
-    config = read_config(ROOT / "configs" / "config.yaml")
-    merged_df, _, _ = load_labeled_data(ROOT / "configs" / "config.yaml")
-    split_config = config["split"]
-    _, validation_df, _ = chronological_split(
-        merged_df,
-        train_ratio=split_config["train_ratio"],
-        validation_ratio=split_config["validation_ratio"],
-        test_ratio=split_config["test_ratio"],
-    )
-    return validation_df.head(10).drop(columns=["isFraud"], errors="ignore").copy()
+    return load_csv_artifact(ROOT / DEMO_TRANSACTIONS_PATH).head(10).copy()
 
 
 def format_percent(value: float) -> str:
@@ -856,15 +864,17 @@ def render_methodology() -> None:
         ]
     )
     st.warning(
-        "Held-out test set has not yet been evaluated. Current metrics are validation metrics, "
-        "cost values are scenario assumptions, many dataset fields are anonymized, and FraudGuard "
-        "is decision support rather than an automatic payment blocker."
+        "Final held-out metrics are reported from the frozen 0.60 policy. Cost values are "
+        "scenario assumptions, many dataset fields are anonymized, and FraudGuard is decision "
+        "support rather than an automatic payment blocker."
     )
 
 
 def main() -> None:
     st.set_page_config(page_title="FraudGuard AI", page_icon=None, layout="wide")
     inject_styles()
+    if not render_startup_health_check():
+        st.stop()
     section = st.sidebar.radio(
         "Navigation",
         [

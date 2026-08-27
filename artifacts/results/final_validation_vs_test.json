@@ -1,0 +1,43 @@
+{
+  "model": "XGBoost",
+  "threshold": 0.6,
+  "rows": [
+    {
+      "metric": "precision",
+      "validation": 0.43078345273861796,
+      "held_out_test": 0.3640176137555043,
+      "difference_test_minus_validation": -0.06676583898311367
+    },
+    {
+      "metric": "recall",
+      "validation": 0.6127547666009204,
+      "held_out_test": 0.5630879013947454,
+      "difference_test_minus_validation": -0.049666865206175026
+    },
+    {
+      "metric": "f1",
+      "validation": 0.5059031076129733,
+      "held_out_test": 0.4421803362200713,
+      "difference_test_minus_validation": -0.063722771392902
+    },
+    {
+      "metric": "pr_auc",
+      "validation": 0.5710183686385969,
+      "held_out_test": 0.5149312721760272,
+      "difference_test_minus_validation": -0.05608709646256971
+    },
+    {
+      "metric": "roc_auc",
+      "validation": 0.9186408652549604,
+      "held_out_test": 0.8912468979230473,
+      "difference_test_minus_validation": -0.027393967331913016
+    },
+    {
+      "metric": "review_rate",
+      "validation": 0.048847947076686875,
+      "held_out_test": 0.05383773043880742,
+      "difference_test_minus_validation": 0.0049897833621205465
+    }
+  ],
+  "note": "Validation threshold metrics were selected before held-out test evaluation."
+}

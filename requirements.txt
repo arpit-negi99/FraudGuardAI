@@ -1,10 +1,2 @@
-pandas
-numpy
-scikit-learn
-pyyaml
-joblib
-pytest
-xgboost
-matplotlib
-shap
-streamlit
+# Python 3.12 runtime expected.
+-r requirements-lock.txt

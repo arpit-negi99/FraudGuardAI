@@ -2,7 +2,11 @@
 
 **Cost-aware online transaction fraud scoring for merchants**
 
-> Status: specification complete; implementation not started yet.
+> Status: final held-out evaluation complete; ready for deployment hardening and presentation preparation.
+
+## Project
+
+FraudGuard AI
 
 ---
 
@@ -11,6 +15,8 @@
 Merchants lose money when fraudulent online transactions are approved, but overly aggressive fraud controls also hurt legitimate customers and create manual-review cost.
 
 FraudGuard AI is a defense-only fraud-risk scorer that ranks transactions by fraud risk, flags higher-risk transactions for manual review, and reports both fraud-detection metrics and false-positive cost.
+
+Short version: merchant transaction fraud risk management.
 
 ---
 
@@ -26,6 +32,15 @@ The MVP will provide:
 - explicit false-positive and missed-fraud cost analysis.
 
 The MVP will **not** automatically block transactions.
+
+### Differentiator
+
+FraudGuard is not just fraud prediction:
+
+- cost-aware policy analysis,
+- review-capacity thresholding,
+- SHAP explainability,
+- human-in-the-loop `ALLOW` / `REVIEW` decisioning.
 
 ---
 
@@ -69,14 +84,14 @@ See `AI-ML-Architecture.md` for the full design.
 
 ## Dataset
 
-Planned dataset: **IEEE-CIS Fraud Detection**.
+Dataset: **IEEE-CIS Fraud Detection**.
 
 Use labeled training files:
 
 - `train_transaction.csv`
 - `train_identity.csv`
 
-The raw dataset is not stored in this repository.
+The raw dataset is not stored in Git.
 
 Public dataset page:
 
@@ -90,9 +105,9 @@ This dataset is not India-specific. Results will be presented as benchmark/MVP r
 
 ## Model
 
-Planned primary model: XGBoost.
+Primary model: XGBoost.
 
-Planned principles:
+Implemented principles:
 
 - class weighting from train split only,
 - histogram CPU training,
@@ -100,7 +115,11 @@ Planned principles:
 - fixed random seed,
 - validation-only threshold selection.
 
-Exact hyperparameters will be recorded after experiments.
+Frozen model artifact: `artifacts/models/xgboost_model.json`.
+
+Frozen preprocessing artifact: `artifacts/preprocessors/preprocessor.joblib`.
+
+Frozen operating threshold: `0.60`, selected on validation data before the held-out test split was opened.
 
 ---
 
@@ -171,16 +190,44 @@ Threshold is selected using validation data only.
 
 ## Results
 
-Implementation has not started. Do not add benchmark numbers here until they are produced by the final evaluation pipeline.
+The operating threshold was selected on validation data before the held-out test was opened.
 
-- Precision: `TODO: add after held-out evaluation`
-- Recall: `TODO: add after held-out evaluation`
-- F1: `TODO: add after held-out evaluation`
-- PR-AUC: `TODO: add after held-out evaluation`
-- ROC-AUC: `TODO: add after held-out evaluation`
-- False-positive rate: `TODO: add after held-out evaluation`
-- Reference-scenario cost: `TODO: add after held-out evaluation`
-- Logistic-baseline comparison: `TODO: add after held-out evaluation`
+### Validation at Threshold 0.60
+
+- Precision: `0.430783`
+- Recall: `0.612755`
+- F1: `0.505903`
+- PR-AUC: `0.571018`
+- ROC-AUC: `0.918641`
+- Review rate: `0.048848`
+
+### Held-Out Test at Frozen Threshold 0.60
+
+- Rows: `88581`
+- Precision: `0.364018`
+- Recall: `0.563088`
+- F1: `0.442180`
+- PR-AUC: `0.514931`
+- ROC-AUC: `0.891247`
+- Accuracy: `0.950554`
+- True positives: `1736`
+- False positives: `3033`
+- True negatives: `82465`
+- False negatives: `1347`
+- Review rate: `0.053838`
+
+### Baselines on Held-Out Test
+
+- Majority legitimate baseline: accuracy `0.965196`, precision `0.000000`, recall `0.000000`, F1 `0.000000`.
+- Logistic Regression at frozen threshold 0.50: precision `0.120339`, recall `0.699319`, F1 `0.205343`, PR-AUC `0.167960`, ROC-AUC `0.822114`, review rate `0.202256`.
+
+### Held-Out Modeled Cost Simulation
+
+Cost values are scenario cost units, not actual merchant savings.
+
+- Low review cost total at threshold 0.60: `219653.97`
+- Medium review cost total at threshold 0.60: `231785.97`
+- High review cost total at threshold 0.60: `246950.97`
 
 ---
 
@@ -221,21 +268,34 @@ Streamlit Community Cloud or equivalent lightweight Python hosting.
 
 ## Installation
 
-Implementation has not started. Planned setup:
+Setup:
 
 ```bash
 python -m venv .venv
-# activate environment
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` will be created during implementation and pinned before final deployment.
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+On macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Runtime dependencies are pinned through `requirements-lock.txt`.
 
 ---
 
 ## Environment Variables
 
 Expected core inference variables: **none**.
+
+No API keys or external model services are required.
 
 Development-only dataset download may use:
 
@@ -250,23 +310,42 @@ Never commit credentials.
 
 ## Running the Project
 
-Planned commands after implementation:
+Core commands:
 
 ```bash
 # Prepare data
-python -m src.data.prepare
+python scripts/prepare_data.py
 
 # Train baseline and primary model
-python -m src.training.train
+python scripts/train_baseline.py
+python scripts/train_xgboost.py
 
-# Run held-out evaluation
-python -m src.evaluation.evaluate
+# Validation analyses
+python scripts/analyze_thresholds.py
+python scripts/analyze_costs.py
+python scripts/generate_explanations.py
+
+# Official final held-out evaluation
+python scripts/evaluate_final_test.py
 
 # Launch demo
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-Command names are part of the planned interface and may be adjusted once implementation begins; update this README if they change.
+The deployed demo uses frozen artifacts and small packaged demo CSVs under `artifacts/demo/`. Raw IEEE-CIS training CSVs are not required for normal inference startup.
+
+## Testing
+
+```bash
+python -m pytest -v
+python scripts/demo_inference.py
+```
+
+## Demo
+
+- Transaction Inspector: inspect packaged historical demo transactions and SHAP contributors.
+- Batch Analysis: score a small CSV-style batch and download scored results.
+- Risk Policy Lab: explore validation-derived threshold tradeoffs without changing the frozen final policy.
 
 ---
 
@@ -302,6 +381,7 @@ Planned deployment process:
 - Many features are anonymized.
 - Fraud prevalence may differ from real merchants.
 - Cost assumptions are scenarios, not observed merchant economics.
+- Current model recall on the held-out test is 56.3%.
 - The risk score is not guaranteed calibrated probability.
 - The system is decision support, not an automatic payment-decline engine.
 - Current fraud behavior can drift beyond the historical dataset.

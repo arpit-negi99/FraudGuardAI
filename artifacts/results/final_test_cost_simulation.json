@@ -1,0 +1,98 @@
+{
+  "model": "XGBoost",
+  "evaluation_split": "chronological_held_out_test",
+  "threshold": 0.6,
+  "assumption_note": "Held-out modeled cost simulation only; threshold was not optimized on test costs.",
+  "scenarios": {
+    "low": {
+      "review_cost_per_transaction": 1.0,
+      "fraud_loss_multiplier": 1.0,
+      "allow_all": {
+        "scenario": "low",
+        "threshold": null,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "true_positive": 0,
+        "false_positive": 0,
+        "true_negative": 85498,
+        "false_negative": 3083,
+        "review_rate": 0.0,
+        "fraud_amount_detected": 0.0,
+        "fraud_amount_missed": 469608.52099999995,
+        "missed_fraud_cost": 469608.52099999995,
+        "false_positive_cost": 0.0,
+        "total_estimated_cost": 469608.52099999995
+      },
+      "frozen_threshold_0_60": {
+        "threshold": 0.6,
+        "fraud_amount_detected": 252987.547,
+        "fraud_amount_missed": 216620.974,
+        "missed_fraud_cost": 216620.974,
+        "false_positive_cost": 3033.0,
+        "total_estimated_cost": 219653.974
+      },
+      "modeled_cost_change_vs_allow_all": -249954.54699999996
+    },
+    "medium": {
+      "review_cost_per_transaction": 5.0,
+      "fraud_loss_multiplier": 1.0,
+      "allow_all": {
+        "scenario": "medium",
+        "threshold": null,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "true_positive": 0,
+        "false_positive": 0,
+        "true_negative": 85498,
+        "false_negative": 3083,
+        "review_rate": 0.0,
+        "fraud_amount_detected": 0.0,
+        "fraud_amount_missed": 469608.52099999995,
+        "missed_fraud_cost": 469608.52099999995,
+        "false_positive_cost": 0.0,
+        "total_estimated_cost": 469608.52099999995
+      },
+      "frozen_threshold_0_60": {
+        "threshold": 0.6,
+        "fraud_amount_detected": 252987.547,
+        "fraud_amount_missed": 216620.974,
+        "missed_fraud_cost": 216620.974,
+        "false_positive_cost": 15165.0,
+        "total_estimated_cost": 231785.974
+      },
+      "modeled_cost_change_vs_allow_all": -237822.54699999996
+    },
+    "high": {
+      "review_cost_per_transaction": 10.0,
+      "fraud_loss_multiplier": 1.0,
+      "allow_all": {
+        "scenario": "high",
+        "threshold": null,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "true_positive": 0,
+        "false_positive": 0,
+        "true_negative": 85498,
+        "false_negative": 3083,
+        "review_rate": 0.0,
+        "fraud_amount_detected": 0.0,
+        "fraud_amount_missed": 469608.52099999995,
+        "missed_fraud_cost": 469608.52099999995,
+        "false_positive_cost": 0.0,
+        "total_estimated_cost": 469608.52099999995
+      },
+      "frozen_threshold_0_60": {
+        "threshold": 0.6,
+        "fraud_amount_detected": 252987.547,
+        "fraud_amount_missed": 216620.974,
+        "missed_fraud_cost": 216620.974,
+        "false_positive_cost": 30330.0,
+        "total_estimated_cost": 246950.974
+      },
+      "modeled_cost_change_vs_allow_all": -222657.54699999996
+    }
+  }
+}
