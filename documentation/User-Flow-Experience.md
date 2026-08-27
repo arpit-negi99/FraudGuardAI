@@ -12,7 +12,7 @@ The user should always be able to see:
 - which features most influenced the score,
 - what the model cannot guarantee.
 
-The UI should be a lightweight Streamlit demo, not a full merchant dashboard product.
+The primary UI is now a polished React merchant dashboard backed by FastAPI. Streamlit may remain as a fallback/debug tool only.
 
 ---
 

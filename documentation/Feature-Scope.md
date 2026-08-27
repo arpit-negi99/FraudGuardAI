@@ -120,7 +120,7 @@ A lightweight, explainable fraud-risk scorer that:
 - Single-transaction scoring.
 - SHAP feature-attribution explanation.
 - Batch CSV scoring.
-- Lightweight Streamlit demo.
+- React + Vite merchant risk console backed by FastAPI.
 - Reproducible model/evaluation artifact saving.
 
 ## P1 — Important
@@ -158,8 +158,8 @@ Do **not** build these during the 10-day MVP:
 - microservices,
 - Kafka,
 - Kubernetes,
-- separate production API unless the Streamlit architecture proves insufficient,
-- a custom React frontend.
+- heavyweight model-serving infrastructure,
+- duplicated JavaScript fraud-scoring logic.
 
 ---
 

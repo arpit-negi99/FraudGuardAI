@@ -13,7 +13,7 @@ The system should detect fraudulent transactions while measuring both:
 
 ## Current Stage
 
-Deployment Hardened - Ready for Final Demo Packaging
+Module 2 Payment Incident Detection Integrated into React + FastAPI
 
 ## Completed Before This Task
 
@@ -302,6 +302,93 @@ Second visual polish pass completed after review feedback that the UI looked too
 Second visual polish local app verification: HTTP 200 from `streamlit run app.py`
 Second visual polish tests: 103 passed, 0 failed, 0 skipped
 
+Client-facing Streamlit UI redesign completed
+Client-facing UI local app verification: HTTP 200 from `streamlit run app.py`
+Client-facing UI navigation verification: Home, Review Queue, Transaction Details, Risk Monitor, Policy Settings, and About FraudGuard each ran with 0 Streamlit test-harness exceptions
+Client-facing UI tests: 122 passed, 0 failed, 0 skipped
+Client-facing UI held-out test evaluation: not performed during UI redesign
+
+React primary frontend implemented
+FastAPI backend implemented
+Shared presentation/inference helper module implemented
+Streamlit retained as fallback/debug UI in `app.py`
+React pages implemented: Dashboard, Transactions, Review Queue, Risk Monitor, Policy, About, Transaction Details
+FastAPI endpoints implemented: `/health`, `/demo/transactions`, `/demo/transactions/{transaction_id}`, `/predict`, `/predict/batch`, `/policy/presets`, `/policy/simulate`, `/risk/summary`, `/risk/review-queue`, `/risk/spike`, `/evaluation/final`
+React frontend local verification: HTTP 200 from Vite dev server at `http://127.0.0.1:5173`
+FastAPI backend local verification: `/health` returned status ok, model_loaded true, preprocessor_loaded true, threshold 0.60
+FastAPI prediction verification: demo transaction detail returned decision plus 5 SHAP contributors
+FastAPI batch verification: one-row batch returned transaction_count 1 and consistent allow/review count
+FastAPI policy verification: presets returned Fraud First, Balanced, Low Friction
+FastAPI spike verification: rolling review-rate spike endpoint returned Normal
+Frontend build verification: `npm run build` succeeded
+Frontend utility tests: 3 passed, 0 failed, 0 skipped
+Python API/integration tests: 132 passed, 0 failed, 0 skipped
+React/FastAPI held-out test tuning: not performed
+Frozen ML unchanged during React/FastAPI migration
+
+Module 2 - Payment Incident Detection: Data + deterministic baseline implemented
+Module 2 data source: synthetic / simulated payment-event data only; not Razorpay production data
+Module 2 supported incident types: DEBIT_SERVICE_MISMATCH, LATE_AUTHORIZATION_RISK, CAPTURED_BUT_UNFULFILLED, REFUND_REQUIRED, RETRY_RELATED_PAYMENT_RISK, COMPLAINT_ESCALATION_RISK, NORMAL_PAYMENT
+Module 2 recommended actions: NO_ACTION, VERIFY_PAYMENT, CHECK_ORDER, INITIATE_REFUND, CONTACT_CUSTOMER, ESCALATE_REVIEW, MONITOR
+Module 2 deterministic rule tests: included in Python suite
+Module 2 Python tests: 147 passed, 0 failed, 0 skipped
+Module 2 synthetic dataset generated: `data/synthetic/payment_incidents.csv`
+Module 2 synthetic summary artifact generated: `artifacts/results/payment_incident_data_summary.json`
+Module 2 synthetic dataset rows: 10000
+Module 2 synthetic normal count: 7447
+Module 2 synthetic incident count: 2553
+Module 2 synthetic incident rate: 0.2553
+Module 2 synthetic incident distribution: NORMAL_PAYMENT=7447, DEBIT_SERVICE_MISMATCH=791, CAPTURED_BUT_UNFULFILLED=495, REFUND_REQUIRED=380, RETRY_RELATED_PAYMENT_RISK=345, LATE_AUTHORIZATION_RISK=335, COMPLAINT_ESCALATION_RISK=207
+Module 2 rule severity distribution on generated data: NONE=7447, HIGH=1666, MEDIUM=680, CRITICAL=207
+Module 2 random seed: 42
+Module 2 known limitations: synthetic payment-event data, not validated on real payment-provider production data, deterministic demonstration rules only, no Module 2 ML model yet
+Module 1 frozen XGBoost model, preprocessor, threshold 0.60, SHAP logic, and held-out results unchanged during Module 2 implementation
+
+Module 2 Step 2 deterministic rule evaluation complete
+Module 2 standard synthetic evaluation rows: 10000
+Module 2 standard binary precision: 1.000000
+Module 2 standard binary recall: 1.000000
+Module 2 standard binary F1: 1.000000
+Module 2 standard binary confusion: TP=2553, FP=0, TN=7447, FN=0
+Module 2 standard macro F1: 1.000000
+Module 2 standard weighted F1: 1.000000
+Module 2 stress synthetic dataset generated: `data/synthetic/payment_incidents_stress.csv`
+Module 2 stress synthetic evaluation rows: 5000
+Module 2 stress binary precision: 1.000000
+Module 2 stress binary recall: 1.000000
+Module 2 stress binary F1: 1.000000
+Module 2 stress binary confusion: TP=1854, FP=0, TN=3146, FN=0
+Module 2 stress macro F1: 1.000000
+Module 2 stress weighted F1: 1.000000
+Module 2 stress zero-support classes: REFUND_REQUIRED, RETRY_RELATED_PAYMENT_RISK, COMPLAINT_ESCALATION_RISK
+Module 2 overlap behavior: highest severity wins; ties follow deterministic rule-check order
+Module 2 overlap audit standard rows with multiple applicable rules: 1423
+Module 2 overlap audit stress rows with multiple applicable rules: 680
+Module 2 weakest cases: no false positives, false negatives, or incident-type errors found on current standard/stress synthetic datasets; remaining weakness is synthetic coverage, especially absent stress support for refund-required, retry-risk, and complaint-escalation primary labels
+Module 2 severity evaluation: unavailable because synthetic ground truth does not independently define expected severity
+Module 2 recommended-action evaluation: unavailable because synthetic ground truth does not independently define expected recommended actions
+Module 2 anti-circularity check: synthetic ground truth generation does not call the detector
+Module 2 evaluation recommendation: keep deterministic rules; ML is not justified by these synthetic evaluations
+Module 2 evaluation artifacts produced: `payment_incident_rule_metrics.json`, `payment_incident_rule_per_class.csv`, `payment_incident_rule_confusion_matrix.png`, `payment_incident_stress_metrics.json`, `payment_incident_stress_per_class.csv`, `payment_incident_stress_confusion_matrix.png`, `payment_incident_error_examples.json`, `payment_incident_rule_precedence.json`
+Module 2 Step 2 Python tests: 161 passed, 0 failed, 0 skipped
+
+Module 2 - Payment Incident Detection integrated into React + FastAPI.
+Module 2 API endpoints implemented: `GET /incidents`, `GET /incidents/summary`, `GET /incidents/{payment_id}`, `POST /incidents/evaluate`, `GET /incidents/types`
+Module 2 frontend page implemented: Payment Incidents
+Module 2 frontend integration: Dashboard payment incident section, Risk Monitor payment operations charts, About two-module architecture
+Module 2 UI features implemented: summary cards, severity/type/search filters, incident table, detail panel, lifecycle fields, rule-engine reasons, recommended action mapping, fraud-vs-payment-incident comparison
+Module 2 packaged demo IDs: `pay_syn_000007` low fraud score + high debit-service mismatch; `pay_syn_000003` captured but unfulfilled; `pay_syn_000012` late authorization risk
+Module 2 stress-only opposite demo ID: `pay_stress_000038` high synthetic fraud score + no payment lifecycle incident
+Module 2 runtime backend verification: `/incidents/summary`, `/incidents?severity=HIGH&limit=2`, `/incidents/pay_syn_000007`, and `POST /incidents/evaluate` returned HTTP 200
+Module 2 runtime frontend verification: Vite dev server returned HTTP 200 at `http://127.0.0.1:5173`
+Module 2 frontend build: `npm run build` succeeded with existing Vite chunk-size warning
+Module 2 frontend utility tests: 7 passed, 0 failed, 0 skipped
+Module 2 Python tests after integration: 171 passed, 0 failed, 0 skipped
+Module 2 remains synthetic payment-event data only.
+Module 2 remains deterministic rules only; no Module 2 ML model added.
+Module 2 limitations: not validated on Razorpay production data; no real gateway, refund, webhook, chargeback, or customer action is performed.
+Module 1 frozen XGBoost model, preprocessor, 422-feature contract, threshold 0.60, SHAP logic, and held-out results unchanged during Module 2 product integration.
+
 Selected threshold: 0.60
 Review rate: 0.053838
 False positives: 3033
@@ -396,6 +483,34 @@ UI polish implementation note:
 * Model & Methodology now uses compact summary cards instead of a plain text list.
 * XGBoost model, preprocessing, feature set, Logistic Regression, validation probabilities, threshold analysis, cost analysis, SHAP calculations, and inference output semantics were not changed.
 * Held-out test split remained untouched during UI polish.
+
+Client-facing UI redesign note:
+
+* Navigation now uses merchant-facing sections: Home, Review Queue, Transaction Details, Risk Monitor, Policy Settings, and About FraudGuard.
+* Home focuses on review workload, highest-risk activity, current demo risk status, and priority transactions.
+* Review Queue shows REVIEW transactions first, with priority and minimum-risk filters plus CSV scoring/download support.
+* Transaction Details presents risk score, recommended action, transaction amount, priority, plain-language signal tables, and demo-only analyst actions.
+* Technical SHAP details and model metrics are available in expanders or About FraudGuard rather than dominating the primary workflow.
+* Risk Monitor is framed as current demo/batch activity; live fraud-spike detection remains a future feature.
+* Policy Settings uses business-friendly review strategies while preserving threshold 0.60 as the balanced frozen policy.
+* The UI redesign changed Streamlit presentation/helper code only.
+* XGBoost model, preprocessing, 422-feature contract, threshold 0.60, final held-out metrics, SHAP artifacts, and inference output semantics were not changed.
+
+React/FastAPI migration note:
+
+* React + Vite is now the primary client-facing submission UI.
+* FastAPI wraps the existing frozen `FraudPredictor`; fraud scoring logic was not duplicated in JavaScript.
+* Shared presentation helpers in `src/inference/presentation.py` define priority bands, review queue sorting, policy presets, cost simulation display, historical demo outcome labels, and lightweight rolling review-rate spike status.
+* Dashboard shows merchant-facing cards, priority transactions, risk distribution, and current-session activity.
+* Transactions page provides search, decision filtering, priority filtering, minimum-risk filtering, sorting, and sliced table display.
+* Review Queue shows only `REVIEW` transactions sorted by risk, with actual SHAP top feature names as top signals.
+* Transaction Details shows risk score, amount, priority, current policy, SHAP contributors, historical demo outcome, and session-only analyst actions.
+* Risk Monitor shows current demo activity charts and a transparent rolling review-rate spike detector, not a second ML model.
+* Policy page uses Fraud First, Balanced, and Low Friction strategy cards plus validation-only advanced metrics and scenario cost simulation.
+* About page shows the frozen architecture, technology stack, final held-out metrics, limitations, and defense-only framing.
+* Streamlit remains available as fallback/debug UI but is no longer the primary submission interface.
+* XGBoost model, preprocessing artifact, 422 transformed features, threshold 0.60, final held-out metrics, and SHAP calculation were not changed.
+* No held-out test result was used for tuning during this migration.
 
 Streamlit pages/features completed:
 
@@ -629,4 +744,4 @@ Required deployment artifacts present: yes
 
 ## Next Action
 
-Ready for final demo script, presentation, and submission packaging.
+Upgrade payment incident simulation from single snapshots to multi-step payment lifecycle timelines.

@@ -1,0 +1,23 @@
+{
+  "data_note": "This dataset is simulated for hackathon demonstration and does not represent proprietary payment-provider data.",
+  "total_rows": 10000,
+  "normal_count": 7447,
+  "incident_count": 2553,
+  "incident_rate": 0.2553,
+  "distribution_by_incident_type": {
+    "NORMAL_PAYMENT": 7447,
+    "DEBIT_SERVICE_MISMATCH": 791,
+    "CAPTURED_BUT_UNFULFILLED": 495,
+    "REFUND_REQUIRED": 380,
+    "RETRY_RELATED_PAYMENT_RISK": 345,
+    "LATE_AUTHORIZATION_RISK": 335,
+    "COMPLAINT_ESCALATION_RISK": 207
+  },
+  "distribution_by_rule_severity": {
+    "CRITICAL": 207,
+    "HIGH": 1666,
+    "MEDIUM": 680,
+    "NONE": 7447
+  },
+  "random_seed": 42
+}

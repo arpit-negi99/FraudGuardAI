@@ -1,94 +1,151 @@
 # FraudGuard AI
 
-Cost-aware merchant transaction fraud-risk scoring with a frozen XGBoost model.
+Cost-aware merchant transaction fraud-risk detection using the IEEE-CIS Fraud Detection dataset.
 
-## Project
-
-FraudGuard AI scores IEEE-CIS-style transactions, returns a fraud risk score, and recommends `ALLOW` or `REVIEW`. It is decision support only; it never automatically blocks a payment.
+FraudGuard AI is a defense-only decision-support system. It scores transactions, recommends `ALLOW` or `REVIEW`, explains model signals with SHAP, and helps reason about review workload and modeled fraud cost. It does not automatically block payments.
 
 ## Problem
 
-Merchant transaction fraud risk management requires balancing missed fraud against unnecessary reviews of legitimate customers.
+Merchants lose money when fraudulent transactions are approved, but overly aggressive fraud controls create manual-review cost and friction for legitimate customers.
 
-## Differentiator
+## Solution
 
-FraudGuard is not just fraud prediction:
+FraudGuard combines a frozen XGBoost fraud-risk model with a validation-selected operating threshold. The client UI focuses on the merchant workflow:
 
-- cost-aware policy analysis
-- review-capacity thresholding
-- SHAP explainability
-- human-in-the-loop `ALLOW` / `REVIEW` decisioning
+- transaction risk scoring
+- `ALLOW` / `REVIEW` policy
+- SHAP explanations
+- review queue
+- batch scoring through the API
+- cost-aware policy simulator
+- risk monitoring with lightweight rolling review-rate spike status
 
-## Final Held-Out Metrics
+Module 2 adds payment lifecycle incident detection using deterministic rules and explicitly synthetic / simulated payment-event data. It is separate from IEEE-CIS fraud scoring and does not claim to use Razorpay production data.
 
-Frozen system:
+## Two Risk Modules
 
-- Model: `XGBoost`
-- Features: `422`
-- Threshold: `0.60`
-- Model artifact: `artifacts/models/xgboost_model.json`
-- Preprocessor artifact: `artifacts/preprocessors/preprocessor.joblib`
+### Transaction Fraud Detection
 
-Threshold `0.60` was selected using validation analysis before opening the held-out test set.
+Uses XGBoost and the IEEE-CIS Fraud Detection dataset to identify transactions that resemble historically fraudulent transactions. The frozen threshold remains `0.60`; the UI presents this as an `ALLOW` / `REVIEW` decision-support signal.
 
-Held-out chronological test metrics:
+### Payment Incident Detection
 
-- Precision: `0.364018`
-- Recall: `0.563088`
-- F1: `0.442180`
-- PR-AUC: `0.514931`
-- ROC-AUC: `0.891247`
-- Review rate: `0.053838`
+Uses deterministic payment-lifecycle safeguards and synthetic payment-event data to identify unresolved payment-state inconsistencies that may lead to complaints, refunds, or disputes. This module is separate from transaction fraud scoring and performs no real gateway, refund, or chargeback action.
 
-## Setup
+## Architecture
+
+```text
+                       FraudGuard AI
+                            |
+              +-------------+-------------+
+              |                           |
+              v                           v
+      Fraud Risk Engine          Payment Incident Engine
+         XGBoost                     Deterministic Rules
+              |                           |
+              +-------------+-------------+
+                            |
+                            v
+                     Risk Operations
+                            |
+             +--------------+--------------+
+             |                             |
+             v                             v
+       Fraud Review                  Incident Response
+```
+
+The React frontend is the primary submission UI. FastAPI reuses the existing Python inference pipeline and never duplicates fraud scoring logic in JavaScript. Streamlit remains as a fallback/debug UI in `app.py`.
+
+Module 2 API endpoints:
+
+- `GET /incidents`
+- `GET /incidents/summary`
+- `GET /incidents/{payment_id}`
+- `POST /incidents/evaluate`
+- `GET /incidents/types`
+
+## Final Held-Out Results
+
+Frozen threshold: `0.60`
+
+| Metric | Held-out test |
+| --- | ---: |
+| Precision | 36.4% |
+| Recall | 56.3% |
+| F1 | 44.2% |
+| PR-AUC | 0.515 |
+| ROC-AUC | 0.891 |
+| Review rate | 5.38% |
+
+These values come from the chronological held-out test artifact. The threshold was selected before held-out evaluation and must not be tuned against these results.
+
+## Screenshots
+
+Screenshots will be added manually after visual review.
+
+## Local Setup
+
+Install Python dependencies:
 
 ```bash
-python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-On Windows PowerShell:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-On macOS/Linux:
+Install frontend dependencies:
 
 ```bash
-source .venv/bin/activate
+cd frontend
+npm install
 ```
 
-## Run
+## Running Locally
+
+Backend:
 
 ```bash
-python -m streamlit run app.py
+python -m uvicorn backend.api:app --reload --port 8000
 ```
 
-No API keys or external model services are required.
+Frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Default frontend URL: `http://localhost:5173`
+
+The frontend reads `VITE_API_BASE_URL`; see `frontend/.env.example`.
+
+Primary UI sections include Dashboard, Transactions, Review Queue, Payment Incidents, Risk Monitor, Policy, and About.
 
 ## Testing
 
+Python:
+
 ```bash
-python -m pytest -v
-python scripts/demo_inference.py
+python -m pip check
+python -m pytest -q
 ```
 
-## Demo
+Frontend:
 
-- Transaction Inspector: inspect packaged historical demo transactions and SHAP contributors.
-- Batch Analysis: score a small CSV-style batch and download scored results.
-- Risk Policy Lab: explore validation-derived threshold tradeoffs without changing the frozen final policy.
-
-The deployed demo uses frozen artifacts and small demo CSVs under `artifacts/demo/`; raw IEEE-CIS training CSVs are not required for normal inference startup.
+```bash
+cd frontend
+npm run build
+npm test
+```
 
 ## Limitations
 
-- Many IEEE-CIS features are anonymized.
-- Costs are simulated assumptions, not observed merchant economics.
-- Current model recall on the held-out test is 56.3%.
-- The model is decision support, not an automatic blocker.
-- The risk score is not calibrated as a guaranteed probability.
-- The dataset may not reflect current production fraud patterns.
+- Dataset features are partly anonymized.
+- Risk score is not guaranteed calibrated probability.
+- Cost values are modeled assumptions, not actual merchant savings.
+- FraudGuard does not automatically block transactions.
+- Held-out recall is 56.3%.
+- The historical IEEE-CIS dataset may not reflect current production fraud patterns.
+- Payment incident data is synthetic and does not represent proprietary payment-provider systems.
 
-See `documentation/README.md` and `PROJECT-STATUS.md` for the full project log and methodology.
+## Defense-Only Design
+
+FraudGuard is only for defensive fraud detection and review prioritization. It does not provide fraud-generation workflows, evasion guidance, offensive simulation, credential collection, or automatic payment-decline behavior.

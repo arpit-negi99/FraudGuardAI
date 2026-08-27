@@ -1,0 +1,581 @@
+{
+  "false_positive": [],
+  "false_negative": [],
+  "incorrect_incident_type": [],
+  "severity_mismatch": {
+    "available": false,
+    "reason": "No independent expected severity exists in the synthetic datasets."
+  },
+  "overlapping_rules": [
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000001",
+      "scenario": "DEBIT_SERVICE_MISMATCH",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 1,
+        "time_since_payment_minutes": 89,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.223983
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000006",
+      "scenario": "RETRY_RISK",
+      "true_incident_label": true,
+      "true_incident_type": "RETRY_RELATED_PAYMENT_RISK",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "RETRY_RELATED_PAYMENT_RISK",
+      "predicted_severity": "MEDIUM",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Retry count is unusually high",
+        "Customer debit recorded",
+        "Earlier payment state remains unresolved",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "pending",
+        "order_status": "created",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 3,
+        "time_since_payment_minutes": 79,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.013906
+      },
+      "applicable_incident_types": [
+        "RETRY_RELATED_PAYMENT_RISK",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000007",
+      "scenario": "DEBIT_SERVICE_MISMATCH",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 2,
+        "time_since_payment_minutes": 174,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.016879
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000008",
+      "scenario": "DEBIT_SERVICE_MISMATCH",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 1,
+        "time_since_payment_minutes": 55,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.103906
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000021",
+      "scenario": "DEBIT_SERVICE_MISMATCH",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 2,
+        "time_since_payment_minutes": 131,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.049635
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000023",
+      "scenario": "RETRY_RISK",
+      "true_incident_label": true,
+      "true_incident_type": "RETRY_RELATED_PAYMENT_RISK",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "RETRY_RELATED_PAYMENT_RISK",
+      "predicted_severity": "MEDIUM",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Retry count is unusually high",
+        "Customer debit recorded",
+        "Earlier payment state remains unresolved",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "pending",
+        "order_status": "created",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 5,
+        "time_since_payment_minutes": 84,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.14235
+      },
+      "applicable_incident_types": [
+        "RETRY_RELATED_PAYMENT_RISK",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000024",
+      "scenario": "REFUND_REQUIRED",
+      "true_incident_label": true,
+      "true_incident_type": "REFUND_REQUIRED",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "REFUND_REQUIRED",
+      "predicted_severity": "HIGH",
+      "recommended_action": "INITIATE_REFUND",
+      "reasons": [
+        "Payment is authorized or captured",
+        "Order failed or was cancelled",
+        "Refund has not been initiated",
+        "Gateway status is captured",
+        "Service is not delivered",
+        "Order is not fulfilled",
+        "Customer debit recorded",
+        "Service is not fulfilled"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "captured",
+        "order_status": "cancelled",
+        "service_delivered": false,
+        "callback_received": true,
+        "refund_status": "none",
+        "retry_count": 0,
+        "time_since_payment_minutes": 128,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.084706
+      },
+      "applicable_incident_types": [
+        "REFUND_REQUIRED",
+        "CAPTURED_BUT_UNFULFILLED",
+        "DEBIT_SERVICE_MISMATCH"
+      ]
+    },
+    {
+      "dataset": "standard",
+      "payment_id": "pay_syn_000025",
+      "scenario": "DEBIT_SERVICE_MISMATCH",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 1,
+        "time_since_payment_minutes": 139,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.025558
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000003",
+      "scenario": "REFUND_PENDING",
+      "true_incident_label": true,
+      "true_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_severity": "HIGH",
+      "recommended_action": "CHECK_ORDER",
+      "reasons": [
+        "Gateway status is captured",
+        "Service is not delivered",
+        "Order is not fulfilled",
+        "Customer debit recorded",
+        "Service is not fulfilled"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "captured",
+        "order_status": "cancelled",
+        "service_delivered": false,
+        "callback_received": true,
+        "refund_status": "pending",
+        "retry_count": 0,
+        "time_since_payment_minutes": 80,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.069877
+      },
+      "applicable_incident_types": [
+        "CAPTURED_BUT_UNFULFILLED",
+        "DEBIT_SERVICE_MISMATCH"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000019",
+      "scenario": "LOW_FRAUD_CLEAR_INCIDENT",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 1,
+        "time_since_payment_minutes": 163,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.023645
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000023",
+      "scenario": "REFUND_PENDING",
+      "true_incident_label": true,
+      "true_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_severity": "HIGH",
+      "recommended_action": "CHECK_ORDER",
+      "reasons": [
+        "Gateway status is captured",
+        "Service is not delivered",
+        "Order is not fulfilled",
+        "Customer debit recorded",
+        "Service is not fulfilled"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "captured",
+        "order_status": "cancelled",
+        "service_delivered": false,
+        "callback_received": true,
+        "refund_status": "pending",
+        "retry_count": 0,
+        "time_since_payment_minutes": 51,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.11437
+      },
+      "applicable_incident_types": [
+        "CAPTURED_BUT_UNFULFILLED",
+        "DEBIT_SERVICE_MISMATCH"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000029",
+      "scenario": "LOW_FRAUD_CLEAR_INCIDENT",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 2,
+        "time_since_payment_minutes": 111,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.01737
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000033",
+      "scenario": "REFUND_PENDING",
+      "true_incident_label": true,
+      "true_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_severity": "HIGH",
+      "recommended_action": "CHECK_ORDER",
+      "reasons": [
+        "Gateway status is captured",
+        "Service is not delivered",
+        "Order is not fulfilled",
+        "Customer debit recorded",
+        "Service is not fulfilled"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "captured",
+        "order_status": "cancelled",
+        "service_delivered": false,
+        "callback_received": true,
+        "refund_status": "pending",
+        "retry_count": 0,
+        "time_since_payment_minutes": 115,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.089537
+      },
+      "applicable_incident_types": [
+        "CAPTURED_BUT_UNFULFILLED",
+        "DEBIT_SERVICE_MISMATCH"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000034",
+      "scenario": "LOW_FRAUD_CLEAR_INCIDENT",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 2,
+        "time_since_payment_minutes": 132,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.045384
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000044",
+      "scenario": "LOW_FRAUD_CLEAR_INCIDENT",
+      "true_incident_label": true,
+      "true_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "DEBIT_SERVICE_MISMATCH",
+      "predicted_severity": "HIGH",
+      "recommended_action": "VERIFY_PAYMENT",
+      "reasons": [
+        "Customer debit recorded",
+        "Gateway status is failed",
+        "Service is not fulfilled",
+        "Gateway status is pending or failed",
+        "Callback is missing",
+        "Payment has been unresolved for at least 30 minutes",
+        "Customer retry activity is present"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "failed",
+        "order_status": "failed",
+        "service_delivered": false,
+        "callback_received": false,
+        "refund_status": "none",
+        "retry_count": 2,
+        "time_since_payment_minutes": 107,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.003311
+      },
+      "applicable_incident_types": [
+        "DEBIT_SERVICE_MISMATCH",
+        "LATE_AUTHORIZATION_RISK"
+      ]
+    },
+    {
+      "dataset": "stress",
+      "payment_id": "pay_stress_000045",
+      "scenario": "REFUND_PENDING",
+      "true_incident_label": true,
+      "true_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_incident_detected": true,
+      "predicted_incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "predicted_severity": "HIGH",
+      "recommended_action": "CHECK_ORDER",
+      "reasons": [
+        "Gateway status is captured",
+        "Service is not delivered",
+        "Order is not fulfilled",
+        "Customer debit recorded",
+        "Service is not fulfilled"
+      ],
+      "fields": {
+        "bank_debited": true,
+        "gateway_status": "captured",
+        "order_status": "cancelled",
+        "service_delivered": false,
+        "callback_received": true,
+        "refund_status": "pending",
+        "retry_count": 0,
+        "time_since_payment_minutes": 78,
+        "customer_complaint": false,
+        "fraud_risk_score": 0.19551
+      },
+      "applicable_incident_types": [
+        "CAPTURED_BUT_UNFULFILLED",
+        "DEBIT_SERVICE_MISMATCH"
+      ]
+    }
+  ]
+}

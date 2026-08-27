@@ -1,0 +1,174 @@
+{
+  "dataset": "standard_synthetic",
+  "rows": 10000,
+  "binary": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "true_positive": 2553,
+    "false_positive": 0,
+    "true_negative": 7447,
+    "false_negative": 0
+  },
+  "macro_f1": 1.0,
+  "weighted_f1": 1.0,
+  "per_class": [
+    {
+      "incident_type": "NORMAL_PAYMENT",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 7447
+    },
+    {
+      "incident_type": "DEBIT_SERVICE_MISMATCH",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 791
+    },
+    {
+      "incident_type": "LATE_AUTHORIZATION_RISK",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 335
+    },
+    {
+      "incident_type": "CAPTURED_BUT_UNFULFILLED",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 495
+    },
+    {
+      "incident_type": "REFUND_REQUIRED",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 380
+    },
+    {
+      "incident_type": "RETRY_RELATED_PAYMENT_RISK",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 345
+    },
+    {
+      "incident_type": "COMPLAINT_ESCALATION_RISK",
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 207
+    }
+  ],
+  "confusion_matrix": {
+    "labels": [
+      "NORMAL_PAYMENT",
+      "DEBIT_SERVICE_MISMATCH",
+      "LATE_AUTHORIZATION_RISK",
+      "CAPTURED_BUT_UNFULFILLED",
+      "REFUND_REQUIRED",
+      "RETRY_RELATED_PAYMENT_RISK",
+      "COMPLAINT_ESCALATION_RISK"
+    ],
+    "matrix": [
+      [
+        7447,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        791,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        335,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        495,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        380,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        345,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        207
+      ]
+    ]
+  },
+  "severity_evaluation": {
+    "available": false,
+    "reason": "Synthetic ground truth does not independently define expected severity."
+  },
+  "recommended_action_evaluation": {
+    "available": false,
+    "reason": "Synthetic ground truth does not independently define expected recommended actions."
+  },
+  "rule_precedence": {
+    "primary_selection_rule": "Highest severity wins; ties follow deterministic rule-check order.",
+    "rule_check_order": [
+      "COMPLAINT_ESCALATION_RISK",
+      "REFUND_REQUIRED",
+      "CAPTURED_BUT_UNFULFILLED",
+      "RETRY_RELATED_PAYMENT_RISK",
+      "DEBIT_SERVICE_MISMATCH",
+      "LATE_AUTHORIZATION_RISK"
+    ],
+    "rationale": "The detector evaluates all conditions, then chooses the highest severity. When severities tie, Python's stable sort keeps the rule-check order above. This makes complaint escalation critical when applicable, makes refund-required more specific than captured-but-unfulfilled, and lets retry-specific unresolved cases win over broader debit-service mismatch."
+  },
+  "overlap_audit": {
+    "rows_with_multiple_applicable_rules": 1423,
+    "applicable_rule_counts": {
+      "CAPTURED_BUT_UNFULFILLED": 1082,
+      "COMPLAINT_ESCALATION_RISK": 207,
+      "DEBIT_SERVICE_MISMATCH": 1378,
+      "LATE_AUTHORIZATION_RISK": 1171,
+      "REFUND_REQUIRED": 587,
+      "RETRY_RELATED_PAYMENT_RISK": 440
+    }
+  }
+}

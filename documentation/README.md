@@ -2,7 +2,7 @@
 
 **Cost-aware online transaction fraud scoring for merchants**
 
-> Status: final held-out evaluation complete; ready for deployment hardening and presentation preparation.
+> Status: React client and FastAPI backend migration in progress; frozen ML system remains unchanged.
 
 ## Project
 
@@ -32,6 +32,8 @@ The MVP will provide:
 - explicit false-positive and missed-fraud cost analysis.
 
 The MVP will **not** automatically block transactions.
+
+Module 2 adds deterministic payment lifecycle incident detection using explicitly synthetic / simulated payment-event data. This is separate from IEEE-CIS fraud scoring and does not represent Razorpay or any proprietary payment-provider production data.
 
 ### Differentiator
 
@@ -73,9 +75,10 @@ flowchart LR
     F --> G[Validation Threshold Selection]
     G --> H[Frozen Model Package]
     H --> I[Held-out Test Evaluation]
-    H --> J[Streamlit Inference]
-    J --> K[Risk Score + ALLOW/REVIEW]
-    J --> L[SHAP Drivers]
+    H --> J[FastAPI Inference]
+    J --> K[React Client]
+    J --> L[Risk Score + ALLOW/REVIEW]
+    J --> M[SHAP Drivers]
 ```
 
 See `AI-ML-Architecture.md` for the full design.
@@ -250,7 +253,9 @@ Python.
 
 ### UI
 
-Streamlit.
+React + Vite is the primary client-facing UI.
+
+Streamlit remains a fallback/debug interface and must not be treated as the primary submission frontend.
 
 ### Experiment tracking
 
@@ -262,7 +267,7 @@ None.
 
 ### Deployment
 
-Streamlit Community Cloud or equivalent lightweight Python hosting.
+React static hosting plus a lightweight Python FastAPI host. The deployed backend should use frozen artifacts and small packaged demo data, not raw IEEE-CIS CSV files.
 
 ---
 
@@ -328,8 +333,10 @@ python scripts/generate_explanations.py
 # Official final held-out evaluation
 python scripts/evaluate_final_test.py
 
-# Launch demo
-python -m streamlit run app.py
+# Launch API and React client
+python -m uvicorn backend.api:app --reload --port 8000
+cd frontend
+npm run dev
 ```
 
 The deployed demo uses frozen artifacts and small packaged demo CSVs under `artifacts/demo/`. Raw IEEE-CIS training CSVs are not required for normal inference startup.
@@ -343,9 +350,10 @@ python scripts/demo_inference.py
 
 ## Demo
 
-- Transaction Inspector: inspect packaged historical demo transactions and SHAP contributors.
-- Batch Analysis: score a small CSV-style batch and download scored results.
-- Risk Policy Lab: explore validation-derived threshold tradeoffs without changing the frozen final policy.
+- Dashboard: review current demo risk activity.
+- Transactions: search and filter packaged demo transactions.
+- Review Queue: inspect REVIEW decisions ranked by risk.
+- Policy: explore validation-derived strategy tradeoffs without changing the frozen final policy.
 
 ---
 
@@ -368,8 +376,8 @@ Planned deployment process:
 1. train/freeze model locally or in a controlled notebook/runtime,
 2. store compact model artifacts,
 3. exclude raw competition data,
-4. deploy Streamlit app,
-5. run single-row and batch smoke tests,
+4. deploy FastAPI backend and React frontend,
+5. run API and client smoke tests,
 6. verify displayed metrics match stored evaluation artifacts.
 
 ---

@@ -4,7 +4,9 @@
 
 Build one reproducible fraud-risk pipeline that uses the **same preprocessing contract** during training, evaluation, and demo inference.
 
-The architecture deliberately avoids LLMs, RAG, vector databases, microservices, and separate model-serving infrastructure.
+The architecture deliberately avoids LLMs, RAG, vector databases, microservices, and heavyweight model-serving infrastructure.
+
+Current client architecture: React + Vite frontend with a lightweight FastAPI backend that imports the frozen `FraudPredictor`.
 
 ---
 
@@ -305,16 +307,16 @@ The test set itself is not packaged into the deployed app.
 
 ## MVP serving choice
 
-Use a single **Streamlit** application that imports the frozen inference pipeline in-process.
+Use a lightweight **FastAPI** application that imports the frozen inference pipeline in-process.
 
-No separate REST API is required for the demo.
+The React frontend is the primary client-facing submission UI. Streamlit may remain available only as a fallback/debug interface.
 
 ### Why
 
-- simplest architecture,
-- fewer deployment failure points,
-- sufficient for single and batch demo use,
-- keeps attention on the AI/ML system rather than web infrastructure.
+- keeps the Python ML pipeline as the source of truth,
+- provides a polished client-facing UI without reimplementing inference in JavaScript,
+- supports single and batch demo use from small packaged artifacts,
+- keeps deployment lightweight.
 
 ---
 

@@ -10,6 +10,8 @@ import pytest
 from app import (
     build_policy_presets,
     demo_outcome_message,
+    display_queue_table,
+    filter_review_queue,
     format_percent,
     format_shap_table,
     load_csv_artifact,
@@ -17,8 +19,11 @@ from app import (
     main_warnings,
     nearest_threshold_metrics,
     parse_cost_scenarios,
+    priority_band,
     predictions_to_download_csv,
     prepare_batch_display,
+    review_queue,
+    risk_distribution,
     sample_batch_csv,
     sorted_shap_importance,
 )
@@ -76,11 +81,12 @@ def test_policy_preset_construction_uses_summary_values() -> None:
     presets = build_policy_presets(summary)
 
     assert [preset["name"] for preset in presets] == [
-        "Higher Fraud Capture",
-        "Capacity-Constrained",
-        "Highest F1",
+        "Fraud First",
+        "Balanced",
+        "Low Friction",
     ]
-    assert [preset["metrics"]["threshold"] for preset in presets] == [0.46, 0.61, 0.79]
+    assert [preset["threshold"] for preset in presets] == [0.46, 0.60, 0.79]
+    assert presets[1]["tradeoff"] == "Frozen default policy"
 
 
 def test_sample_csv_does_not_contain_is_fraud() -> None:
@@ -125,6 +131,7 @@ def test_batch_csv_conversion_for_download() -> None:
             "risk_score": [0.7],
             "threshold": [0.6],
             "decision": ["REVIEW"],
+            "priority": ["High"],
             "unused": ["x"],
         }
     )
@@ -133,6 +140,7 @@ def test_batch_csv_conversion_for_download() -> None:
     csv_text = csv_bytes.decode("utf-8")
 
     assert "transaction_id,risk_score,threshold,decision" in csv_text
+    assert "priority" in csv_text
     assert "unused" not in csv_text
 
 
@@ -152,7 +160,7 @@ def test_batch_display_sorts_highest_risk_first() -> None:
 
 
 def test_false_negative_explanation_appears_only_for_correct_demo_condition() -> None:
-    assert demo_outcome_message(label=1, decision="ALLOW").startswith("Known model miss")
+    assert demo_outcome_message(label=1, decision="ALLOW") == "Model miss"
     assert demo_outcome_message(label=1, decision="REVIEW") is None
     assert demo_outcome_message(label=0, decision="ALLOW") is None
 
@@ -180,8 +188,8 @@ def test_shap_table_has_friendly_labels_and_rounded_contributions() -> None:
         [{"feature": "C13", "value": 2.0, "shap_value": 0.12345}]
     )
 
-    assert list(table.columns) == ["Feature", "Observed value", "Risk contribution"]
-    assert table.iloc[0]["Risk contribution"] == 0.123
+    assert list(table.columns) == ["Signal", "Observed value", "Impact"]
+    assert table.iloc[0]["Impact"] == "Increases risk"
 
 
 def test_missing_artifact_handling(tmp_path) -> None:
@@ -222,3 +230,79 @@ def test_ui_helpers_do_not_trigger_held_out_test_evaluation() -> None:
     assert "fit" not in call_names
     assert "evaluate_binary_classifier" not in names
     assert "X_test" not in names
+
+
+def test_priority_bands_map_scores_to_ui_labels() -> None:
+    assert priority_band(0.95) == "Critical"
+    assert priority_band(0.80) == "High"
+    assert priority_band(0.61) == "Review"
+    assert priority_band(0.40) == "Medium"
+    assert priority_band(0.10) == "Low"
+
+
+def test_review_queue_only_contains_review_decisions_and_sorts_by_risk() -> None:
+    predictions = pd.DataFrame(
+        {
+            "transaction_id": [1, 2, 3],
+            "risk_score": [0.7, 0.95, 0.1],
+            "decision": ["REVIEW", "REVIEW", "ALLOW"],
+            "priority": ["Review", "Critical", "Low"],
+        }
+    )
+
+    queue = review_queue(predictions)
+
+    assert queue["decision"].eq("REVIEW").all()
+    assert queue["transaction_id"].tolist() == [2, 1]
+
+
+def test_review_queue_filters_by_priority_and_minimum_risk() -> None:
+    queue = pd.DataFrame(
+        {
+            "transaction_id": [1, 2, 3],
+            "risk_score": [0.95, 0.82, 0.62],
+            "decision": ["REVIEW", "REVIEW", "REVIEW"],
+            "priority": ["Critical", "High", "Review"],
+        }
+    )
+
+    filtered = filter_review_queue(queue, "High", 0.75)
+
+    assert filtered["transaction_id"].tolist() == [2]
+
+
+def test_risk_distribution_uses_presentation_bands() -> None:
+    predictions = pd.DataFrame(
+        {
+            "risk_score": [0.1, 0.4, 0.65, 0.8, 0.95],
+            "decision": ["ALLOW", "ALLOW", "REVIEW", "REVIEW", "REVIEW"],
+        }
+    )
+
+    distribution = risk_distribution(predictions)
+
+    assert set(distribution["risk_band"]) == {"Low", "Medium", "Review", "High", "Critical"}
+    assert distribution["transactions"].sum() == 5
+
+
+def test_queue_display_keeps_merchant_friendly_columns() -> None:
+    queue = pd.DataFrame(
+        {
+            "transaction_id": [10],
+            "risk_score": [0.95],
+            "transaction_amount": [100.0],
+            "priority": ["Critical"],
+            "decision": ["REVIEW"],
+        }
+    )
+
+    display = display_queue_table(queue)
+
+    assert list(display.columns) == [
+        "Transaction ID",
+        "Risk",
+        "Transaction amount",
+        "Priority",
+        "Decision",
+    ]
+    assert display.iloc[0]["Risk"] == "95.0%"

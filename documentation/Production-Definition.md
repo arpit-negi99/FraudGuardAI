@@ -188,9 +188,9 @@ All exceptions shown to end users should be concise; detailed stack traces belon
 
 ## Primary environment
 
-**Streamlit Community Cloud** or an equivalent lightweight Python app host.
+React + Vite frontend with a lightweight FastAPI backend.
 
-Primary recommendation: Streamlit Community Cloud because the app is already Streamlit and requires no separate frontend/backend deployment.
+Streamlit may remain available as a fallback/debug interface, but it is no longer the primary client-facing deployment target after the React migration.
 
 ## Dependencies
 
@@ -226,8 +226,8 @@ Development-only Kaggle variables may be used for data download.
 5. Freeze model artifacts.
 6. Run automated tests.
 7. Launch app locally with frozen artifacts.
-8. Deploy Streamlit app.
-9. Run smoke tests against deployed app.
+8. Deploy FastAPI backend and React frontend.
+9. Run API/client smoke tests against deployed app.
 10. Tag/freeze final demo commit.
 
 ---

@@ -9,3 +9,5 @@ joblib==1.5.3
 pyyaml==6.0.3
 matplotlib==3.11.1
 pytest==9.1.1
+fastapi==0.135.1
+uvicorn==0.41.0
