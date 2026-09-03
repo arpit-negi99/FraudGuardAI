@@ -43,7 +43,97 @@ export function formatIncidentType(value) {
 }
 
 export function formatAction(value) {
-  return String(value || "NO_ACTION").replaceAll("_", " ");
+  return formatIncidentType(value || "NO_ACTION");
+}
+
+export function formatMonitoringDriver(value) {
+  if (!value || value === "NONE") return "None";
+  return String(value)
+    .replace("_RATE", " rate")
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export function severityRank(severity) {
+  return {
+    CRITICAL: 5,
+    HIGH: 4,
+    MEDIUM: 3,
+    LOW: 2,
+    ELEVATED: 2,
+    NONE: 1,
+    NORMAL: 0,
+  }[String(severity || "NONE").toUpperCase()] ?? 0;
+}
+
+export function statusRank(status) {
+  return {
+    ACTIVE_INCIDENT: 3,
+    RESOLVING: 2,
+    RESOLVED: 1,
+    NORMAL: 0,
+  }[String(status || "NORMAL").toUpperCase()] ?? 0;
+}
+
+export function sortPaymentLifecycles(rows = []) {
+  return [...rows].sort((a, b) => {
+    const severityDelta = severityRank(b.current_severity) - severityRank(a.current_severity);
+    if (severityDelta) return severityDelta;
+    const statusDelta = statusRank(b.status) - statusRank(a.status);
+    if (statusDelta) return statusDelta;
+    return String(a.payment_id || "").localeCompare(String(b.payment_id || ""));
+  });
+}
+
+export function selectDefaultPaymentIncident(rows = []) {
+  const sorted = sortPaymentLifecycles(rows);
+  const preferred = ["pay_life_000007", "pay_life_000017", "pay_life_000033", "pay_life_000004"];
+  return (
+    sorted.find((row) => preferred.includes(row.payment_id) && row.status !== "NORMAL") ||
+    sorted.find((row) => row.incident_detected || row.status === "ACTIVE_INCIDENT" || row.status === "RESOLVING") ||
+    sorted.find((row) => row.status === "RESOLVED" && severityRank(row.highest_severity_observed) >= severityRank("HIGH")) ||
+    sorted[0] ||
+    null
+  );
+}
+
+export function splitMonitoringAlerts(current, alerts = []) {
+  const currentWindow = current?.window_start;
+  const currentStatus = String(current?.status || "NORMAL").toUpperCase();
+  const nonNormal = alerts.filter((alert) => String(alert.severity || "NORMAL").toUpperCase() !== "NORMAL");
+  const currentAlerts =
+    currentStatus === "NORMAL" || !currentWindow
+      ? []
+      : nonNormal.filter((alert) => alert.window_start === currentWindow);
+  const historyAlerts = nonNormal.filter((alert) => alert.window_start !== currentWindow);
+  return {
+    currentAlerts,
+    historyAlerts,
+  };
+}
+
+export function monitoringSignalLabel(status) {
+  return String(status || "NORMAL").toUpperCase() === "NORMAL" ? "Leading Signal" : "Main Driver";
+}
+
+export function timelineTransitionLabel(item, previous) {
+  const incident = item?.incident_type || "NORMAL_PAYMENT";
+  const status = item?.status || "NORMAL";
+  const severity = item?.severity || "NONE";
+  const action = item?.recommended_action || "NO_ACTION";
+  const previousSeverity = previous?.severity || "NONE";
+  const previousIncident = previous?.incident_type || "NORMAL_PAYMENT";
+
+  if (status === "RESOLVED") return "Resolved";
+  if (status === "RESOLVING") return "Incident Resolving";
+  if (action === "INITIATE_REFUND") return "Refund Initiated";
+  if (severityRank(severity) > severityRank(previousSeverity) && previousIncident !== "NORMAL_PAYMENT") {
+    return `Severity Escalated To ${formatIncidentType(severity)}`;
+  }
+  if (incident !== "NORMAL_PAYMENT" && previousIncident === "NORMAL_PAYMENT") return "Incident Detected";
+  if (incident !== "NORMAL_PAYMENT") return "Incident Still Active";
+  return "Normal Event";
 }
 
 export const actionDescriptions = {

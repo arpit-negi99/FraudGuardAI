@@ -1,0 +1,67 @@
+{
+  "precision": 0.9178743961352657,
+  "recall": 1.0,
+  "f1": 0.9571788413098236,
+  "tp": 190,
+  "fp": 17,
+  "tn": 103,
+  "fn": 0,
+  "false_alert_rate": 0.14166666666666666,
+  "window_size_minutes": 15,
+  "baseline_windows": 50,
+  "baseline": {
+    "mean_fraud_risk": {
+      "mean": 0.18239861525,
+      "std": 0.026002961271262247,
+      "median": 0.189786275
+    },
+    "review_rate": {
+      "mean": 0.11775000000000002,
+      "std": 0.034558826658322765,
+      "median": 0.1125
+    },
+    "very_high_risk_rate": {
+      "mean": 0.035,
+      "std": 0.019525624189766635,
+      "median": 0.0375
+    },
+    "payment_incident_rate": {
+      "mean": 0.05250000000000001,
+      "std": 0.025495097567963924,
+      "median": 0.05
+    },
+    "critical_high_incident_rate": {
+      "mean": 0.04425,
+      "std": 0.023077315701788198,
+      "median": 0.05
+    },
+    "debit_service_mismatch_rate": {
+      "mean": 0.02375,
+      "std": 0.01663016836956259,
+      "median": 0.025
+    },
+    "complaint_escalation_rate": {
+      "mean": 0.0055000000000000005,
+      "std": 0.007968688725254613,
+      "median": 0.0
+    },
+    "retry_risk_rate": {
+      "mean": 0.008250000000000002,
+      "std": 0.009555757426808198,
+      "median": 0.0
+    },
+    "captured_unfulfilled_rate": {
+      "mean": 0.014999999999999998,
+      "std": 0.01274754878398196,
+      "median": 0.0125
+    }
+  },
+  "latest": {
+    "window_start": "2026-08-30T15:15:00",
+    "window_end": "2026-08-30T15:30:00",
+    "scenario_type": "RECOVERY",
+    "status": "NORMAL",
+    "primary_driver": "CRITICAL_HIGH_INCIDENT_RATE",
+    "recommended_action": "Prioritize high and critical payment incident response."
+  }
+}

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
+from src.incidents.lifecycle import evaluate_payment_lifecycle
 from src.incidents.rules import evaluate_payment_incident
 from src.incidents.schema import (
     IncidentType,
@@ -18,6 +20,7 @@ from src.incidents.schema import (
 
 ROOT = Path(__file__).resolve().parents[2]
 INCIDENT_DATA_PATH = ROOT / "data/synthetic/payment_incidents.csv"
+LIFECYCLE_DATA_PATH = ROOT / "data/synthetic/payment_lifecycles.json"
 SYNTHETIC_NOTE = (
     "Synthetic payment-event data for demonstration only; not validated on "
     "payment-provider production data."
@@ -134,6 +137,93 @@ def evaluate_event(payload: dict[str, Any]) -> dict[str, Any]:
     return {**_event_to_public_dict(event), **result}
 
 
+@lru_cache(maxsize=1)
+def get_lifecycles() -> list[dict[str, Any]]:
+    """Load packaged synthetic payment lifecycles once per process."""
+    if not LIFECYCLE_DATA_PATH.exists():
+        raise FileNotFoundError(f"Payment lifecycle demo data not found: {LIFECYCLE_DATA_PATH}")
+    with LIFECYCLE_DATA_PATH.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+@lru_cache(maxsize=1)
+def get_evaluated_lifecycles() -> list[dict[str, Any]]:
+    return [_packaged_lifecycle(item) for item in get_lifecycles()]
+
+
+def list_lifecycles(
+    status: str | None = None,
+    scenario_type: str | None = None,
+    limit: int = 100,
+    offset: int = 0,
+) -> dict[str, Any]:
+    rows = get_evaluated_lifecycles()
+    filtered = [
+        row
+        for row in rows
+        if (not status or row["status"] == status)
+        and (not scenario_type or row["scenario_type"] == scenario_type)
+    ]
+    bounded_limit = min(max(limit, 1), 500)
+    bounded_offset = max(offset, 0)
+    return {
+        "total": len(filtered),
+        "limit": bounded_limit,
+        "offset": bounded_offset,
+        "lifecycles": [
+            _lifecycle_summary_row(row)
+            for row in filtered[bounded_offset : bounded_offset + bounded_limit]
+        ],
+    }
+
+
+def lifecycle_detail(payment_id: str) -> dict[str, Any]:
+    for row in get_evaluated_lifecycles():
+        if row["payment_id"] == payment_id:
+            return row
+    raise KeyError(f"Payment lifecycle {payment_id} was not found.")
+
+
+def evaluate_lifecycle(payload: dict[str, Any]) -> dict[str, Any]:
+    return evaluate_payment_lifecycle(payload)
+
+
+def lifecycle_summary() -> dict[str, Any]:
+    rows = get_evaluated_lifecycles()
+    status_counts: dict[str, int] = {}
+    highest_severity_counts: dict[str, int] = {}
+    resolution_times = []
+    event_counts = []
+    for row in rows:
+        status_counts[row["status"]] = status_counts.get(row["status"], 0) + 1
+        severity = row["highest_severity_observed"]
+        highest_severity_counts[severity] = highest_severity_counts.get(severity, 0) + 1
+        event_counts.append(len(row["events"]))
+        if row["time_to_resolution_minutes"] is not None:
+            resolution_times.append(row["time_to_resolution_minutes"])
+    return {
+        "lifecycle_count": len(rows),
+        "active": status_counts.get("ACTIVE_INCIDENT", 0),
+        "resolving": status_counts.get("RESOLVING", 0),
+        "resolved": status_counts.get("RESOLVED", 0),
+        "normal": status_counts.get("NORMAL", 0),
+        "critical": highest_severity_counts.get("CRITICAL", 0),
+        "average_event_count": sum(event_counts) / len(event_counts) if event_counts else 0.0,
+        "average_resolution_time_minutes": (
+            sum(resolution_times) / len(resolution_times) if resolution_times else None
+        ),
+        "status_distribution": [
+            {"status": key, "payments": value}
+            for key, value in sorted(status_counts.items())
+        ],
+        "highest_severity_distribution": [
+            {"severity": key, "payments": value}
+            for key, value in sorted(highest_severity_counts.items())
+        ],
+        "data_note": SYNTHETIC_NOTE,
+    }
+
+
 def _packaged_incident(row: dict[str, Any]) -> dict[str, Any]:
     event = parse_payment_event({field: row[field] for field in DETAIL_FIELDS})
     result = evaluate_payment_incident(event).to_dict()
@@ -144,6 +234,35 @@ def _packaged_incident(row: dict[str, Any]) -> dict[str, Any]:
         "synthetic_label": bool(row.get("incident_label", False)),
         "synthetic_incident_type": row.get("incident_type"),
         "data_note": SYNTHETIC_NOTE,
+    }
+
+
+def _packaged_lifecycle(row: dict[str, Any]) -> dict[str, Any]:
+    evaluation = evaluate_payment_lifecycle(row)
+    return {
+        **evaluation,
+        "scenario_type": row.get("scenario_type"),
+        "expected_resolution": row.get("expected_resolution"),
+        "expected_final_status": row.get("expected_final_status"),
+        "data_note": SYNTHETIC_NOTE,
+    }
+
+
+def _lifecycle_summary_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "payment_id": row["payment_id"],
+        "merchant_id": row["merchant_id"],
+        "amount": row["amount"],
+        "payment_method": row["payment_method"],
+        "fraud_risk_score": row["fraud_risk_score"],
+        "scenario_type": row["scenario_type"],
+        "status": row["status"],
+        "current_incident": row["current_incident"],
+        "current_severity": row["current_severity"],
+        "highest_severity_observed": row["highest_severity_observed"],
+        "first_incident_time_minutes": row["first_incident_time_minutes"],
+        "time_to_resolution_minutes": row["time_to_resolution_minutes"],
+        "recommended_action": row["recommended_action"],
     }
 
 

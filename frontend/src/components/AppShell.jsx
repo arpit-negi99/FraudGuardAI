@@ -40,19 +40,21 @@ export function AppShell({ page, setPage, health, children }) {
           ))}
         </nav>
         <div className="sidebar-status">
-          <span>Model Online</span>
-          <strong>{health?.status === "ok" ? "Ready" : "Checking"}</strong>
-          <small>Policy: Balanced</small>
-          <small>Threshold: 0.60</small>
+          <span>System Status</span>
+          <strong><i />{health?.status === "ok" ? "Ready" : "Checking"}</strong>
+          <small>Policy</small>
+          <b>Balanced</b>
+          <small>Review threshold</small>
+          <b>0.60</b>
         </div>
       </aside>
       <main>
         <header className="topbar">
           <div>
-            <p>Defense-only fraud decision support</p>
             <h2>{page}</h2>
+            <p>Defense-only decision support</p>
           </div>
-          <div className="topbar-pill">ALLOW / REVIEW</div>
+          <div className="topbar-pill">Human-in-the-loop</div>
         </header>
         {children}
       </main>

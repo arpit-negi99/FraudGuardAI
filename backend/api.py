@@ -5,11 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.schemas import (
     BatchPredictionRequest,
+    MonitoringEvaluationRequest,
     PaymentIncidentEvaluationRequest,
+    PaymentLifecycleEvaluationRequest,
     PolicySimulationRequest,
     TransactionRequest,
 )
-from backend.services import fraud_service, incident_service
+from backend.services import fraud_service, incident_service, monitoring_service
 from src.inference.predict import ArtifactLoadError, InferenceError, InferenceInputError
 
 
@@ -32,12 +34,18 @@ app.add_middleware(
 @app.get("/health")
 def health() -> dict:
     try:
-        return fraud_service.health()
+        return {
+            **fraud_service.health(),
+            "incident_module_available": True,
+            "monitoring_module_available": True,
+        }
     except ArtifactLoadError as exc:
         return {
             "status": "error",
             "model_loaded": False,
             "preprocessor_loaded": False,
+            "incident_module_available": True,
+            "monitoring_module_available": True,
             "threshold": 0.60,
             "message": str(exc),
         }
@@ -120,6 +128,54 @@ def final_evaluation() -> dict:
     return fraud_service.final_evaluation()
 
 
+@app.get("/monitoring/summary")
+def monitoring_summary() -> dict:
+    return monitoring_service.summary()
+
+
+@app.get("/monitoring/windows")
+def monitoring_windows(
+    scenario_type: str | None = None,
+    limit: int = Query(default=120, ge=1, le=500),
+) -> dict:
+    try:
+        return monitoring_service.windows(scenario_type=scenario_type, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/monitoring/current")
+def monitoring_current(scenario_type: str | None = None) -> dict:
+    try:
+        return monitoring_service.current(scenario_type=scenario_type)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/monitoring/alerts")
+def monitoring_alerts(
+    scenario_type: str | None = None,
+    limit: int = Query(default=50, ge=1, le=200),
+) -> dict:
+    try:
+        return monitoring_service.alerts(scenario_type=scenario_type, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/monitoring/scenarios")
+def monitoring_scenarios() -> dict:
+    return monitoring_service.scenarios()
+
+
+@app.post("/monitoring/evaluate")
+def monitoring_evaluate(request: MonitoringEvaluationRequest) -> dict:
+    try:
+        return monitoring_service.evaluate_custom(request.records, request.window_minutes)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/incidents")
 def incidents(
     severity: str | None = None,
@@ -155,6 +211,51 @@ def incidents_summary() -> dict:
 @app.get("/incidents/types")
 def incidents_types() -> dict:
     return incident_service.incident_types()
+
+
+@app.get("/incidents/lifecycles")
+def incident_lifecycles(
+    status: str | None = None,
+    scenario_type: str | None = None,
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+) -> dict:
+    try:
+        return incident_service.list_lifecycles(
+            status=status,
+            scenario_type=scenario_type,
+            limit=limit,
+            offset=offset,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/incidents/lifecycles/summary")
+def incident_lifecycle_summary() -> dict:
+    try:
+        return incident_service.lifecycle_summary()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/incidents/lifecycles/{payment_id}")
+def incident_lifecycle(payment_id: str) -> dict:
+    try:
+        return incident_service.lifecycle_detail(payment_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/incidents/lifecycles/evaluate")
+def evaluate_incident_lifecycle(request: PaymentLifecycleEvaluationRequest) -> dict:
+    try:
+        payload = request.model_dump() if hasattr(request, "model_dump") else request.dict()
+        return incident_service.evaluate_lifecycle(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.get("/incidents/{payment_id}")

@@ -11,6 +11,9 @@ dist/
 .pytest_cache/
 .ruff_cache/
 *.log
+.coverage
+.DS_Store
+.freebuff/
 
 data/raw/*
 data/processed/*

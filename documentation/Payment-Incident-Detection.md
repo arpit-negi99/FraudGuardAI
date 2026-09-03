@@ -145,3 +145,90 @@ Limitations:
 - Module 2 is deterministic rule logic, not ML.
 - No Razorpay production validation is claimed.
 - No real gateway action, refund, chargeback, webhook, or customer action is performed.
+
+## Multi-Step Lifecycle Reasoning
+
+The snapshot detector remains intact through `evaluate_payment_incident(event)`.
+
+The lifecycle engine replays ordered lifecycle events into a snapshot-compatible `PaymentEvent` after every event, then calls the existing snapshot evaluator. This produces:
+
+- current reconstructed state
+- current incident and severity
+- timeline evaluations
+- first incident detection time
+- highest severity observed
+- resolution status and resolution time where applicable
+- event-by-event rule reasons
+
+Supported lifecycle event types:
+
+- `PAYMENT_CREATED`
+- `BANK_DEBITED`
+- `CALLBACK_RECEIVED`
+- `CALLBACK_MISSING`
+- `PAYMENT_AUTHORIZED`
+- `PAYMENT_CAPTURED`
+- `PAYMENT_FAILED`
+- `CUSTOMER_RETRY`
+- `ORDER_CONFIRMED`
+- `ORDER_FULFILLED`
+- `ORDER_FAILED`
+- `REFUND_INITIATED`
+- `REFUND_PROCESSED`
+- `REFUND_FAILED`
+- `CUSTOMER_COMPLAINT`
+
+Lifecycle statuses:
+
+- `NORMAL`
+- `ACTIVE_INCIDENT`
+- `RESOLVING`
+- `RESOLVED`
+
+The lifecycle simulator is scenario-first and does not call the detector to create labels. It generates synthetic timelines only.
+
+Generated artifacts:
+
+- `data/synthetic/payment_lifecycles.json`
+- `artifacts/results/payment_lifecycle_summary.json`
+
+Generated lifecycle scenarios:
+
+- `NORMAL_SUCCESS`
+- `SAFE_FAILURE`
+- `DEBIT_GATEWAY_FAILURE`
+- `LATE_AUTHORIZATION`
+- `CAPTURED_UNFULFILLED`
+- `REFUND_RESOLUTION`
+- `COMPLAINT_ESCALATION`
+- `RETRY_RELATED_RISK`
+
+Current generated lifecycle summary:
+
+- Lifecycle count: 3000
+- Average events: 4.729333333333333
+- Active: 1237
+- Resolved: 244
+- Normal: 1519
+- Median resolution time: 68.0 minutes
+
+Evaluated lifecycle API summary:
+
+- Critical histories: 120
+- Highest severity distribution: CRITICAL=120, HIGH=929, MEDIUM=432, NONE=1519
+
+Lifecycle API endpoints:
+
+- `GET /incidents/lifecycles`
+- `GET /incidents/lifecycles/summary`
+- `GET /incidents/lifecycles/{payment_id}`
+- `POST /incidents/lifecycles/evaluate`
+
+Lifecycle demo payment IDs:
+
+- `pay_life_000004`: late authorization.
+- `pay_life_000017`: captured/unfulfilled path that currently recommends refund initiation.
+- `pay_life_000033`: refund resolution, resolved after 68 minutes.
+- `pay_life_000007`: complaint escalation to critical severity.
+
+This lifecycle upgrade still does not use real payment-provider production data and does not perform real payment actions.

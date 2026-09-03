@@ -35,3 +35,17 @@ class PaymentIncidentEvaluationRequest(BaseModel):
     time_since_payment_minutes: int = Field(ge=0)
     customer_complaint: bool
     fraud_risk_score: float | None = Field(default=None, ge=0, le=1)
+
+
+class PaymentLifecycleEvaluationRequest(BaseModel):
+    payment_id: str = Field(min_length=1)
+    merchant_id: str = Field(min_length=1)
+    amount: float = Field(ge=0)
+    payment_method: str
+    fraud_risk_score: float | None = Field(default=None, ge=0, le=1)
+    events: list[dict[str, Any]] = Field(min_length=1)
+
+
+class MonitoringEvaluationRequest(BaseModel):
+    records: list[dict[str, Any]] = Field(min_length=1)
+    window_minutes: int = Field(default=15, ge=1)

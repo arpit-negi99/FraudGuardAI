@@ -4,8 +4,11 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
+  ReferenceLine,
   XAxis,
   YAxis,
 } from "recharts";
@@ -96,6 +99,44 @@ export function IncidentTypeChart({ data }) {
           <Bar dataKey="payments" fill="#0f766e" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function MonitoringRateChart({ rows }) {
+  const data = rows.map((row, index) => ({
+    ...row,
+    index: index + 1,
+    review_rate_percent: Number(row.review_rate || 0) * 100,
+    incident_rate_percent: Number(row.payment_incident_rate || 0) * 100,
+  }));
+  return (
+    <div className="chart-card">
+      <div className="section-title">
+        <h3>Risk Trend</h3>
+        <p>Review rate and payment incident rate by 15-minute window</p>
+      </div>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="index" />
+          <YAxis unit="%" />
+          <Tooltip />
+          <ReferenceLine y={5} stroke="#94a3b8" strokeDasharray="4 4" />
+          <Line type="monotone" dataKey="review_rate_percent" name="Review rate" stroke="#dc2626" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="incident_rate_percent" name="Incident rate" stroke="#0f766e" strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function OperationalRiskStrip({ rows }) {
+  return (
+    <div className="risk-strip" aria-label="Operational risk timeline">
+      {rows.map((row) => (
+        <span key={row.window_start} className={`risk-strip-cell status-${String(row.status).toLowerCase()}`} title={`${row.window_start}: ${row.status}`} />
+      ))}
     </div>
   );
 }

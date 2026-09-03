@@ -13,7 +13,7 @@ The system should detect fraudulent transactions while measuring both:
 
 ## Current Stage
 
-Module 2 Payment Incident Detection Integrated into React + FastAPI
+PRODUCT FROZEN - Submission Preparation
 
 ## Completed Before This Task
 
@@ -389,6 +389,59 @@ Module 2 remains deterministic rules only; no Module 2 ML model added.
 Module 2 limitations: not validated on Razorpay production data; no real gateway, refund, webhook, chargeback, or customer action is performed.
 Module 1 frozen XGBoost model, preprocessor, 422-feature contract, threshold 0.60, SHAP logic, and held-out results unchanged during Module 2 product integration.
 
+Module 2 multi-step lifecycle reasoning implemented.
+Module 2 lifecycle event types: PAYMENT_CREATED, BANK_DEBITED, CALLBACK_RECEIVED, CALLBACK_MISSING, PAYMENT_AUTHORIZED, PAYMENT_CAPTURED, PAYMENT_FAILED, CUSTOMER_RETRY, ORDER_CONFIRMED, ORDER_FULFILLED, ORDER_FAILED, REFUND_INITIATED, REFUND_PROCESSED, REFUND_FAILED, CUSTOMER_COMPLAINT
+Module 2 lifecycle scenarios: NORMAL_SUCCESS, SAFE_FAILURE, DEBIT_GATEWAY_FAILURE, LATE_AUTHORIZATION, CAPTURED_UNFULFILLED, REFUND_RESOLUTION, COMPLAINT_ESCALATION, RETRY_RELATED_RISK
+Module 2 lifecycle artifacts generated: `data/synthetic/payment_lifecycles.json`, `artifacts/results/payment_lifecycle_summary.json`
+Module 2 lifecycle count: 3000
+Module 2 lifecycle average event count: 4.729333333333333
+Module 2 lifecycle generated scenario distribution: SAFE_FAILURE=528, NORMAL_SUCCESS=991, LATE_AUTHORIZATION=298, RETRY_RELATED_RISK=134, COMPLAINT_ESCALATION=120, DEBIT_GATEWAY_FAILURE=390, CAPTURED_UNFULFILLED=295, REFUND_RESOLUTION=244
+Module 2 lifecycle generated status distribution: NORMAL=1519, ACTIVE_INCIDENT=1237, RESOLVED=244
+Module 2 lifecycle median resolution time: 68.0 minutes
+Module 2 evaluated lifecycle highest severity distribution: CRITICAL=120, HIGH=929, MEDIUM=432, NONE=1519
+Module 2 lifecycle APIs implemented: `GET /incidents/lifecycles`, `GET /incidents/lifecycles/summary`, `GET /incidents/lifecycles/{payment_id}`, `POST /incidents/lifecycles/evaluate`
+Module 2 frontend timeline implemented in Payment Incidents detail panel.
+Module 2 Dashboard lifecycle widget implemented.
+Module 2 Risk Monitor incident resolution overview implemented.
+Module 2 lifecycle demo IDs: `pay_life_000004` late authorization; `pay_life_000017` captured/unfulfilled current refund-required path; `pay_life_000033` refund successfully resolves incident in 68 minutes; `pay_life_000007` complaint escalation to CRITICAL
+Module 2 lifecycle runtime backend verification: lifecycle list, summary, detail, active filter, resolved filter, and POST evaluate returned HTTP 200
+Module 2 lifecycle runtime frontend verification: Vite dev server returned HTTP 200 at `http://127.0.0.1:5173`; timeline UI compiled in production build
+Module 2 lifecycle Python tests: 189 passed, 0 failed, 0 skipped
+Module 2 lifecycle frontend utility tests: 7 passed, 0 failed, 0 skipped
+Module 2 lifecycle frontend build: `npm run build` succeeded with existing Vite chunk-size warning
+Module 2 lifecycle limitations: synthetic lifecycle data only; deterministic logic only; no real Razorpay/provider data; no real payment action performed
+Module 1 frozen XGBoost model, preprocessor, 422-feature contract, threshold 0.60, SHAP logic, and held-out results unchanged during lifecycle implementation.
+
+Module 3 - Fraud Spike & Operational Risk Monitoring implemented.
+Module 3 architecture: consumes Module 1-style fraud scores/decisions and Module 2-style payment incident outputs in a synthetic stream, then applies rolling-window statistical monitoring.
+Module 3 monitoring window size: 15 minutes
+Module 3 baseline windows: 50 initial normal windows
+Module 3 EWMA alpha: 0.50
+Module 3 very-high-risk monitoring threshold: fraud_risk_score >= 0.90; this does not change Module 1 threshold 0.60
+Module 3 monitored metrics: mean_fraud_risk, review_rate, very_high_risk_rate, payment_incident_rate, critical_high_incident_rate, debit_service_mismatch_rate, complaint_escalation_rate, retry_risk_rate, captured_unfulfilled_rate
+Module 3 synthetic stream generated: `data/synthetic/monitoring_stream.csv`
+Module 3 synthetic stream rows: 24800
+Module 3 synthetic monitoring scenarios: NORMAL, FRAUD_RISK_SPIKE, PAYMENT_INCIDENT_SPIKE, DEBIT_SERVICE_MISMATCH_SPIKE, COMPLAINT_SPIKE, RETRY_SPIKE, MIXED_RISK_SPIKE, RECOVERY
+Module 3 synthetic scenario distribution: NORMAL=6400, RECOVERY=3200, MIXED_RISK_SPIKE=3200, FRAUD_RISK_SPIKE=2800, PAYMENT_INCIDENT_SPIKE=2800, DEBIT_SERVICE_MISMATCH_SPIKE=2400, RETRY_SPIKE=2000, COMPLAINT_SPIKE=2000
+Module 3 evaluation precision: 0.9178743961352657
+Module 3 evaluation recall: 1.0
+Module 3 evaluation F1: 0.9571788413098236
+Module 3 evaluation confusion: TP=190, FP=17, TN=103, FN=0
+Module 3 false alert rate: 0.14166666666666666
+Module 3 detection delay: mean=0.0 minutes, median=0.0 minutes, max=0 minutes
+Module 3 scenario performance: NORMAL had 5 false-alert windows out of 80; FRAUD_RISK_SPIKE detected; PAYMENT_INCIDENT_SPIKE detected; DEBIT_SERVICE_MISMATCH_SPIKE detected; COMPLAINT_SPIKE detected; RETRY_SPIKE detected; MIXED_RISK_SPIKE detected; RECOVERY returned to normal in the latest window but had 12 early recovery alert windows
+Module 3 APIs implemented: `GET /monitoring/summary`, `GET /monitoring/windows`, `GET /monitoring/current`, `GET /monitoring/alerts`, `GET /monitoring/scenarios`, `POST /monitoring/evaluate`
+Module 3 frontend implemented: Risk Monitor scenario selector, current status cards, main driver, review/incident trend chart, operational risk strip, active alerts, alert history, and technical details expander
+Module 3 Dashboard integration implemented: Operational Risk card and synthetic stream monitor summary
+Module 3 artifacts produced: `monitoring_stream_summary.json`, `spike_monitor_metrics.json`, `spike_monitor_windows.csv`, `spike_monitor_scenario_metrics.csv`, `spike_monitor_detection_delay.json`, `review_rate_over_time.png`, `payment_incident_rate_over_time.png`, `operational_risk_over_time.png`
+Module 3 Python tests: 216 passed, 0 failed, 0 skipped
+Module 3 frontend utility tests: 8 passed, 0 failed, 0 skipped
+Module 3 frontend build: `npm run build` succeeded with existing Vite chunk-size warning
+Module 3 runtime verification: monitoring summary/current/windows/alerts/scenarios endpoints verified; normal, fraud spike, payment incident spike, debit-service mismatch spike, mixed spike, and recovery scenarios checked; frontend returned HTTP 200
+Module 3 limitations: synthetic monitoring stream only; statistical detection only; no production merchant feed; no automatic blocking/refund/action; defense-only monitoring
+Module 1 frozen XGBoost model, preprocessor, 422-feature contract, threshold 0.60, SHAP logic, and held-out results unchanged during Module 3 implementation.
+Module 2 snapshot rules, lifecycle reasoning, synthetic incident data, and lifecycle artifacts unchanged except as consumed by Module 3-style stream records.
+
 Selected threshold: 0.60
 Review rate: 0.053838
 False positives: 3033
@@ -742,6 +795,61 @@ Absolute local paths required by app/demo: no
 Required deployment artifacts present: yes
 ```
 
+## Final Product Freeze
+
+Product functionality is frozen for submission preparation.
+
+No additional core modules should be added unless a blocking issue is discovered.
+
+Freeze hardening completed:
+
+* Judge-facing root `README.md` rewritten.
+* Frozen system summary created at `documentation/FROZEN-SYSTEM.md`.
+* Five-minute demo walkthrough created at `documentation/DEMO-FLOW.md`.
+* Screenshot placeholder directory created at `documentation/screenshots/`.
+* `.gitignore` hardened for local caches, frontend build output, raw dataset files, and large generated directories.
+* FastAPI `/health` endpoint now reports Module 2 and Module 3 availability along with the frozen fraud service health.
+* Frontend Vite build configured with an explicit chart chunk to avoid large bundle warnings.
+* `httpx2==2.12.0` added to `requirements-lock.txt` because FastAPI/Starlette TestClient requires it in the current locked stack.
+* Final Python test verification completed: 216 passed, 0 failed, 0 skipped.
+* Final frontend utility tests completed: 8 passed, 0 failed, 0 skipped.
+* Final frontend production build completed without warnings.
+* Final project `.venv` dependency check completed: no broken requirements found.
+* Global Python dependency check still reports unrelated Google/MediaPipe/spaCy-side conflicts; project `.venv` is clean.
+* Final backend runtime smoke completed from `.venv`: `/health`, `/demo/transactions`, lifecycle detail examples, and monitoring scenario endpoints returned HTTP 200.
+* Final frontend runtime smoke completed: Vite dev app returned HTTP 200.
+* Raw IEEE-CIS files confirmed ignored by Git; only `data/raw/.gitkeep` is tracked under `data/raw/`.
+* Required runtime artifacts confirmed present.
+* Local cache/build directories removed after verification.
+
+Final professional UI polish completed:
+
+* Dashboard demo review workload clarified as sample-scoped, not held-out review rate.
+* Dashboard payment-incident preview now prioritizes actionable lifecycle incidents.
+* Payment Incidents now defaults to active incidents and sorts by severity/status priority.
+* Payment Incident detail header now surfaces incident type, severity, current state, and analyst-action context.
+* Payment lifecycle timeline now highlights normal events, incident detection, escalation, refund/remediation states, resolving, and resolved states from existing lifecycle output.
+* Risk Monitor now separates Current Alerts from Recent Alert History.
+* Risk Monitor NORMAL state now shows zero current alerts while keeping previous alerts only in history.
+* Risk Monitor synthetic stream labels added to scenario selector, metric cards, and timeline context.
+* Module 3 synthetic evaluation metrics moved under the `How was this detected?` technical expander.
+* About page now separates Module 1 real held-out evaluation, Module 2 synthetic scenario validation, and Module 3 synthetic monitoring evaluation.
+* Header/sidebar copy polished while preserving defense-only positioning.
+* Frontend utility tests expanded from 8 to 16 tests.
+* Final frontend build completed successfully after polish.
+* Final Python regression suite completed: 216 passed, 0 failed, 0 skipped.
+* Browser automation tool was unavailable in this Codex session; HTTP runtime smoke checks completed, but manual browser screenshot QA still needs to be performed before recording.
+
+Freeze constraints:
+
+* Module 1 XGBoost model unchanged.
+* Module 1 threshold unchanged at 0.60.
+* Preprocessor artifact unchanged.
+* Final held-out metrics unchanged.
+* Module 2 deterministic rules unchanged.
+* Module 3 monitoring logic unchanged.
+* No new ML model, LLM, payment gateway integration, database, refund action, or automatic blocking was added.
+
 ## Next Action
 
-Upgrade payment incident simulation from single snapshots to multi-step payment lifecycle timelines.
+Deploy frontend/backend, capture final screenshots, rehearse 5-minute pitch, and submit GitHub repository.

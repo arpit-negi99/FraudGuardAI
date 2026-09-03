@@ -1,0 +1,37 @@
+{
+  "by_scenario": [
+    {
+      "scenario_type": "FRAUD_RISK_SPIKE",
+      "delay_windows": 0,
+      "delay_minutes": 0
+    },
+    {
+      "scenario_type": "PAYMENT_INCIDENT_SPIKE",
+      "delay_windows": 0,
+      "delay_minutes": 0
+    },
+    {
+      "scenario_type": "DEBIT_SERVICE_MISMATCH_SPIKE",
+      "delay_windows": 0,
+      "delay_minutes": 0
+    },
+    {
+      "scenario_type": "COMPLAINT_SPIKE",
+      "delay_windows": 0,
+      "delay_minutes": 0
+    },
+    {
+      "scenario_type": "RETRY_SPIKE",
+      "delay_windows": 0,
+      "delay_minutes": 0
+    },
+    {
+      "scenario_type": "MIXED_RISK_SPIKE",
+      "delay_windows": 0,
+      "delay_minutes": 0
+    }
+  ],
+  "mean_detection_delay_minutes": 0.0,
+  "median_detection_delay_minutes": 0.0,
+  "max_detection_delay_minutes": 0
+}

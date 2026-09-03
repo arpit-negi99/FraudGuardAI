@@ -36,9 +36,37 @@ export const api = {
   getIncident: (paymentId) => request(`/incidents/${paymentId}`),
   evaluateIncident: (payload) =>
     request("/incidents/evaluate", { method: "POST", body: JSON.stringify(payload) }),
+  getLifecycles: (filters = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "" && value !== "All") {
+        params.set(key, value);
+      }
+    });
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    return request(`/incidents/lifecycles${suffix}`);
+  },
+  getLifecycleSummary: () => request("/incidents/lifecycles/summary"),
+  getLifecycle: (paymentId) => request(`/incidents/lifecycles/${paymentId}`),
+  evaluateLifecycle: (payload) =>
+    request("/incidents/lifecycles/evaluate", { method: "POST", body: JSON.stringify(payload) }),
   riskSummary: () => request("/risk/summary"),
   reviewQueue: () => request("/risk/review-queue"),
   riskSpike: () => request("/risk/spike"),
+  monitoringSummary: () => request("/monitoring/summary"),
+  monitoringCurrent: (scenarioType = "") =>
+    request(`/monitoring/current${scenarioType ? `?scenario_type=${encodeURIComponent(scenarioType)}` : ""}`),
+  monitoringWindows: (scenarioType = "", limit = 120) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (scenarioType) params.set("scenario_type", scenarioType);
+    return request(`/monitoring/windows?${params.toString()}`);
+  },
+  monitoringAlerts: (scenarioType = "", limit = 20) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (scenarioType) params.set("scenario_type", scenarioType);
+    return request(`/monitoring/alerts?${params.toString()}`);
+  },
+  monitoringScenarios: () => request("/monitoring/scenarios"),
   policyPresets: () => request("/policy/presets"),
   policySimulate: (payload) =>
     request("/policy/simulate", { method: "POST", body: JSON.stringify(payload) }),

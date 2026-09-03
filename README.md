@@ -1,104 +1,62 @@
 # FraudGuard AI
 
-Cost-aware merchant transaction fraud-risk detection using the IEEE-CIS Fraud Detection dataset.
+FraudGuard AI is a defense-only merchant risk operations demo. It combines transaction fraud scoring, payment lifecycle incident detection, and operational spike monitoring in a React + FastAPI application.
 
-FraudGuard AI is a defense-only decision-support system. It scores transactions, recommends `ALLOW` or `REVIEW`, explains model signals with SHAP, and helps reason about review workload and modeled fraud cost. It does not automatically block payments.
+The product is frozen for submission preparation. The frozen fraud threshold is `0.60`.
 
-## Problem
+## What It Does
 
-Merchants lose money when fraudulent transactions are approved, but overly aggressive fraud controls create manual-review cost and friction for legitimate customers.
+- Scores merchant transactions with a frozen XGBoost fraud-risk model.
+- Recommends `ALLOW` or `REVIEW`; it never automatically blocks payments.
+- Shows SHAP-based top contributors for transaction review.
+- Detects simulated payment lifecycle incidents with deterministic rules.
+- Monitors synthetic population-level risk spikes with rolling statistical windows.
+- Clearly separates real held-out fraud evaluation from synthetic Module 2 and Module 3 demonstrations.
 
-## Solution
+## Modules
 
-FraudGuard combines a frozen XGBoost fraud-risk model with a validation-selected operating threshold. The client UI focuses on the merchant workflow:
+| Module | Purpose | Data | Method |
+| --- | --- | --- | --- |
+| Module 1 | Transaction fraud risk | IEEE-CIS labeled training data | XGBoost + SHAP |
+| Module 2 | Payment lifecycle incidents | Synthetic payment-event data | Deterministic lifecycle rules |
+| Module 3 | Operational spike monitoring | Synthetic monitoring stream | Z-score + EWMA windows |
 
-- transaction risk scoring
-- `ALLOW` / `REVIEW` policy
-- SHAP explanations
-- review queue
-- batch scoring through the API
-- cost-aware policy simulator
-- risk monitoring with lightweight rolling review-rate spike status
+## Final Held-Out Module 1 Results
 
-Module 2 adds payment lifecycle incident detection using deterministic rules and explicitly synthetic / simulated payment-event data. It is separate from IEEE-CIS fraud scoring and does not claim to use Razorpay production data.
+The held-out test split was opened only after validation-based model and threshold selection.
 
-## Two Risk Modules
+| Metric | Value |
+| --- | ---: |
+| Precision | 0.364018 |
+| Recall | 0.563088 |
+| F1 | 0.442180 |
+| PR-AUC | 0.514931 |
+| ROC-AUC | 0.891247 |
+| Review rate | 0.053838 |
 
-### Transaction Fraud Detection
-
-Uses XGBoost and the IEEE-CIS Fraud Detection dataset to identify transactions that resemble historically fraudulent transactions. The frozen threshold remains `0.60`; the UI presents this as an `ALLOW` / `REVIEW` decision-support signal.
-
-### Payment Incident Detection
-
-Uses deterministic payment-lifecycle safeguards and synthetic payment-event data to identify unresolved payment-state inconsistencies that may lead to complaints, refunds, or disputes. This module is separate from transaction fraud scoring and performs no real gateway, refund, or chargeback action.
-
-## Architecture
+## Runtime Architecture
 
 ```text
-                       FraudGuard AI
-                            |
-              +-------------+-------------+
-              |                           |
-              v                           v
-      Fraud Risk Engine          Payment Incident Engine
-         XGBoost                     Deterministic Rules
-              |                           |
-              +-------------+-------------+
-                            |
-                            v
-                     Risk Operations
-                            |
-             +--------------+--------------+
-             |                             |
-             v                             v
-       Fraud Review                  Incident Response
+React + Vite UI
+    |
+FastAPI backend
+    |
+    +-- Module 1: frozen XGBoost + preprocessor + SHAP
+    +-- Module 2: payment lifecycle rules
+    +-- Module 3: statistical monitoring
 ```
 
-The React frontend is the primary submission UI. FastAPI reuses the existing Python inference pipeline and never duplicates fraud scoring logic in JavaScript. Streamlit remains as a fallback/debug UI in `app.py`.
-
-Module 2 API endpoints:
-
-- `GET /incidents`
-- `GET /incidents/summary`
-- `GET /incidents/{payment_id}`
-- `POST /incidents/evaluate`
-- `GET /incidents/types`
-
-## Final Held-Out Results
-
-Frozen threshold: `0.60`
-
-| Metric | Held-out test |
-| --- | ---: |
-| Precision | 36.4% |
-| Recall | 56.3% |
-| F1 | 44.2% |
-| PR-AUC | 0.515 |
-| ROC-AUC | 0.891 |
-| Review rate | 5.38% |
-
-These values come from the chronological held-out test artifact. The threshold was selected before held-out evaluation and must not be tuned against these results.
-
-## Screenshots
-
-Screenshots will be added manually after visual review.
+Streamlit remains available in `app.py` as a fallback/debug UI. The React frontend is the primary submission UI.
 
 ## Local Setup
 
-Install Python dependencies:
-
 ```bash
 python -m pip install -r requirements.txt
-```
-
-Install frontend dependencies:
-
-```bash
 cd frontend
 npm install
 ```
 
-## Running Locally
+## Run Locally
 
 Backend:
 
@@ -115,11 +73,31 @@ npm run dev
 
 Default frontend URL: `http://localhost:5173`
 
-The frontend reads `VITE_API_BASE_URL`; see `frontend/.env.example`.
+The frontend can read `VITE_API_BASE_URL`; see `frontend/.env.example`.
 
-Primary UI sections include Dashboard, Transactions, Review Queue, Payment Incidents, Risk Monitor, Policy, and About.
+## Key API Endpoints
 
-## Testing
+- `GET /health`
+- `GET /demo/transactions`
+- `GET /demo/transactions/{transaction_id}`
+- `POST /predict`
+- `POST /predict/batch`
+- `GET /risk/review-queue`
+- `GET /policy/presets`
+- `POST /policy/simulate`
+- `GET /evaluation/final`
+- `GET /incidents/lifecycles`
+- `GET /incidents/lifecycles/{payment_id}`
+- `GET /monitoring/current`
+- `GET /monitoring/scenarios`
+
+## Demo Guide
+
+Use [documentation/DEMO-FLOW.md](documentation/DEMO-FLOW.md) for the 5-minute walkthrough.
+
+Screenshots should be captured after final visual review and stored in `documentation/screenshots/`.
+
+## Tests
 
 Python:
 
@@ -132,20 +110,23 @@ Frontend:
 
 ```bash
 cd frontend
-npm run build
 npm test
+npm run build
 ```
+
+## Dataset Safety
+
+Raw IEEE-CIS CSV files live under `data/raw/` and are intentionally ignored by Git. They are not required for normal demo runtime. Do not commit the raw Kaggle dataset.
 
 ## Limitations
 
-- Dataset features are partly anonymized.
-- Risk score is not guaranteed calibrated probability.
-- Cost values are modeled assumptions, not actual merchant savings.
-- FraudGuard does not automatically block transactions.
-- Held-out recall is 56.3%.
-- The historical IEEE-CIS dataset may not reflect current production fraud patterns.
-- Payment incident data is synthetic and does not represent proprietary payment-provider systems.
+- Fraud scores are model risk scores, not guaranteed calibrated probabilities.
+- Held-out recall is 0.563088 at threshold `0.60`.
+- IEEE-CIS features are anonymized and historical.
+- Cost simulations use assumptions, not measured merchant savings.
+- Module 2 and Module 3 use synthetic data for demonstration.
+- No real payment-provider credentials, webhooks, refunds, chargebacks, or payment actions are included.
 
-## Defense-Only Design
+## Frozen System Notes
 
-FraudGuard is only for defensive fraud detection and review prioritization. It does not provide fraud-generation workflows, evasion guidance, offensive simulation, credential collection, or automatic payment-decline behavior.
+See [documentation/FROZEN-SYSTEM.md](documentation/FROZEN-SYSTEM.md) for the artifact audit, freeze rules, and module boundaries.

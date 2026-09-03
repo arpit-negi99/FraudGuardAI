@@ -26,8 +26,10 @@ export default function App() {
   const presets = useApi(api.policyPresets, []);
   const evaluation = useApi(api.finalEvaluation, []);
   const incidentSummary = useApi(api.getIncidentSummary, []);
-  const incidentPreview = useApi(
-    () => api.getIncidents({ incident_detected: true, limit: 3 }),
+  const lifecycleSummary = useApi(api.getLifecycleSummary, []);
+  const monitoringSummary = useApi(api.monitoringSummary, []);
+  const lifecyclePreview = useApi(
+    () => api.getLifecycles({ status: "ACTIVE_INCIDENT", limit: 3 }),
     [],
   );
   const detail = useApi(
@@ -70,9 +72,11 @@ export default function App() {
           summary={summary.data || {}}
           transactions={rows}
           incidentSummary={incidentSummary.data || {}}
-          incidentRows={incidentPreview.data?.incidents || []}
-          loading={summary.loading || transactions.loading || incidentSummary.loading || incidentPreview.loading}
-          error={summary.error || transactions.error || incidentSummary.error || incidentPreview.error}
+          lifecycleSummary={lifecycleSummary.data || {}}
+          monitoringSummary={monitoringSummary.data || {}}
+          incidentRows={lifecyclePreview.data?.lifecycles || []}
+          loading={summary.loading || transactions.loading || incidentSummary.loading || lifecycleSummary.loading || monitoringSummary.loading || lifecyclePreview.loading}
+          error={summary.error || transactions.error || incidentSummary.error || lifecycleSummary.error || monitoringSummary.error || lifecyclePreview.error}
           onOpen={openTransaction}
           onOpenIncident={openIncident}
           events={events}
@@ -87,8 +91,9 @@ export default function App() {
       {page === "Payment Incidents" ? (
         <PaymentIncidents
           summary={incidentSummary.data || {}}
+          lifecycleSummary={lifecycleSummary.data || {}}
           summaryLoading={incidentSummary.loading}
-          summaryError={incidentSummary.error}
+          summaryError={incidentSummary.error || lifecycleSummary.error}
           selectedPaymentId={selectedPaymentId}
           setSelectedPaymentId={setSelectedPaymentId}
         />
@@ -101,16 +106,24 @@ export default function App() {
           summary={summary.data || {}}
           transactions={rows}
           incidentSummary={incidentSummary.data || {}}
+          lifecycleSummary={lifecycleSummary.data || {}}
+          monitoringSummary={monitoringSummary.data || {}}
           spike={spike.data}
-          loading={summary.loading || transactions.loading || spike.loading || incidentSummary.loading}
-          error={summary.error || transactions.error || spike.error || incidentSummary.error}
+          loading={summary.loading || transactions.loading || spike.loading || incidentSummary.loading || lifecycleSummary.loading || monitoringSummary.loading}
+          error={summary.error || transactions.error || spike.error || incidentSummary.error || lifecycleSummary.error || monitoringSummary.error}
         />
       ) : null}
       {page === "Policy" ? (
         <Policy presets={presets.data?.presets || []} loading={presets.loading} error={presets.error} />
       ) : null}
       {page === "About" ? (
-        <About evaluation={evaluation.data} loading={evaluation.loading} error={evaluation.error} />
+        <About
+          evaluation={evaluation.data}
+          incidentSummary={incidentSummary.data || {}}
+          monitoringSummary={monitoringSummary.data || {}}
+          loading={evaluation.loading || incidentSummary.loading || monitoringSummary.loading}
+          error={evaluation.error || incidentSummary.error || monitoringSummary.error}
+        />
       ) : null}
     </AppShell>
   );

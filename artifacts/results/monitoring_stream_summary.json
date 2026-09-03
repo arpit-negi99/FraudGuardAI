@@ -1,0 +1,16 @@
+{
+  "rows": 24800,
+  "events_per_window": 80,
+  "random_seed": 314,
+  "scenario_distribution": {
+    "NORMAL": 6400,
+    "RECOVERY": 3200,
+    "MIXED_RISK_SPIKE": 3200,
+    "FRAUD_RISK_SPIKE": 2800,
+    "PAYMENT_INCIDENT_SPIKE": 2800,
+    "DEBIT_SERVICE_MISMATCH_SPIKE": 2400,
+    "RETRY_SPIKE": 2000,
+    "COMPLAINT_SPIKE": 2000
+  },
+  "synthetic_monitoring_note": "Synthetic monitoring time; not live merchant or payment-provider traffic."
+}

@@ -1,0 +1,26 @@
+{
+  "data_note": "This dataset is simulated for hackathon demonstration and does not represent proprietary payment-provider data.",
+  "random_seed": 211,
+  "lifecycle_count": 3000,
+  "scenario_distribution": {
+    "SAFE_FAILURE": 528,
+    "NORMAL_SUCCESS": 991,
+    "LATE_AUTHORIZATION": 298,
+    "RETRY_RELATED_RISK": 134,
+    "COMPLAINT_ESCALATION": 120,
+    "DEBIT_GATEWAY_FAILURE": 390,
+    "CAPTURED_UNFULFILLED": 295,
+    "REFUND_RESOLUTION": 244
+  },
+  "status_distribution": {
+    "NORMAL": 1519,
+    "ACTIVE_INCIDENT": 1237,
+    "RESOLVED": 244
+  },
+  "active": 1237,
+  "resolving": 0,
+  "resolved": 244,
+  "normal": 1519,
+  "average_event_count": 4.729333333333333,
+  "median_resolution_time_minutes": 68.0
+}
