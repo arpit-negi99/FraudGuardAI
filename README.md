@@ -2,6 +2,10 @@
 
 **AI-powered fraud-risk decision support for merchant payments**
 
+## Live Demo
+
+[Open FraudGuard AI](https://frontend-arpit-negi99s-projects.vercel.app)
+
 FraudGuard AI helps merchants identify risky transactions before they turn into fraud losses, chargebacks, refund disputes, or unnecessary manual-review cost. It scores each transaction with a frozen machine-learning model, applies a locked review threshold, and gives the risk team a clear `ALLOW` or `REVIEW` recommendation.
 
 The system is strictly defense-only. It does not generate fraud tactics, bypass controls, auto-block payments, issue refunds, or connect to real payment-provider infrastructure.
@@ -161,6 +165,12 @@ Backend: Render
 Frontend: Vercel
 Streaming mode: local
 External API keys: none
+```
+
+Current frontend deployment:
+
+```text
+https://frontend-arpit-negi99s-projects.vercel.app
 ```
 
 ### Backend On Render
