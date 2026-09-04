@@ -75,6 +75,10 @@ Cost values are scenario estimates, not claimed merchant savings.
 
 ## Application Architecture
 
+![FraudGuard AI architecture](documentation/assets/fraudguard-architecture.png)
+
+The diagram shows how a merchant or analyst interacts with the React console, which calls the FastAPI backend for all risk decisions. The backend keeps the fraud model, payment incident logic, and operational monitoring separate, while optional streaming infrastructure can publish scored events to a worker and state store for live risk updates.
+
 ```text
 React + Vite frontend
     |
