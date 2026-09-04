@@ -109,6 +109,7 @@ export default function App() {
           lifecycleSummary={lifecycleSummary.data || {}}
           monitoringSummary={monitoringSummary.data || {}}
           spike={spike.data}
+          health={health.data}
           loading={summary.loading || transactions.loading || spike.loading || incidentSummary.loading || lifecycleSummary.loading || monitoringSummary.loading}
           error={summary.error || transactions.error || spike.error || incidentSummary.error || lifecycleSummary.error || monitoringSummary.error}
         />

@@ -1,5 +1,10 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
+export function monitoringStreamUrl(merchantId = "merchant_demo_001") {
+  const params = new URLSearchParams({ merchant_id: merchantId });
+  return `${API_BASE_URL}/monitoring/stream?${params.toString()}`;
+}
+
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -71,7 +76,7 @@ export const api = {
   policySimulate: (payload) =>
     request("/policy/simulate", { method: "POST", body: JSON.stringify(payload) }),
   finalEvaluation: () => request("/evaluation/final"),
-  predict: (transaction, includeExplanation = true) =>
+  predict: (transaction, includeExplanation = false) =>
     request("/predict", {
       method: "POST",
       body: JSON.stringify({ transaction, include_explanation: includeExplanation }),

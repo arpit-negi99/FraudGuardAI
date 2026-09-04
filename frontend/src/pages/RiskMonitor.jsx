@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MetricCard } from "../components/MetricCard";
 import { MonitoringRateChart, OperationalRiskStrip } from "../components/Charts";
 import { StateBlock } from "../components/StateBlock";
+import { useRiskStream } from "../hooks/useRiskStream";
 import { api } from "../services/api";
 import {
   formatMonitoringDriver,
@@ -9,6 +10,7 @@ import {
   monitoringSignalLabel,
   splitMonitoringAlerts,
 } from "../utils/format";
+import { isStreamMode, normalizeStreamCurrent, streamStatusLabel } from "../utils/stream";
 
 const scenarioLabels = {
   NORMAL: "Normal activity",
@@ -21,7 +23,7 @@ const scenarioLabels = {
   RECOVERY: "Recovery",
 };
 
-export function RiskMonitor({ monitoringSummary, loading, error }) {
+export function RiskMonitor({ monitoringSummary, loading, error, health }) {
   const [scenario, setScenario] = useState("NORMAL");
   const [current, setCurrent] = useState(null);
   const [windows, setWindows] = useState([]);
@@ -29,13 +31,15 @@ export function RiskMonitor({ monitoringSummary, loading, error }) {
   const [scenarios, setScenarios] = useState([]);
   const [monitorError, setMonitorError] = useState("");
   const [monitorLoading, setMonitorLoading] = useState(true);
+  const streamEnabled = isStreamMode(health);
+  const { state: streamState, connectionState } = useRiskStream({ enabled: streamEnabled });
 
   useEffect(() => {
     let active = true;
     setMonitorLoading(true);
     setMonitorError("");
     Promise.all([
-      api.monitoringCurrent(scenario),
+      api.monitoringCurrent(streamEnabled ? "" : scenario),
       api.monitoringWindows(scenario, 80),
       api.monitoringAlerts(scenario, 20),
       api.monitoringScenarios(),
@@ -56,7 +60,12 @@ export function RiskMonitor({ monitoringSummary, loading, error }) {
     return () => {
       active = false;
     };
-  }, [scenario]);
+  }, [scenario, streamEnabled]);
+
+  useEffect(() => {
+    const normalized = normalizeStreamCurrent(streamState);
+    if (normalized) setCurrent(normalized);
+  }, [streamState]);
 
   const { currentAlerts, historyAlerts } = useMemo(
     () => splitMonitoringAlerts(current, alerts),
@@ -69,17 +78,22 @@ export function RiskMonitor({ monitoringSummary, loading, error }) {
     <StateBlock loading={loading || monitorLoading} error={error || monitorError}>
       <section className="page-heading">
         <h2>Risk Monitor</h2>
-        <p>Detect unusual changes across fraud activity and payment operations using a synthetic monitoring stream.</p>
+        <p>Detect unusual changes across fraud activity and payment operations using the active demo stream.</p>
+      </section>
+      <section className="stream-status-row">
+        <span className={`stream-dot ${streamEnabled && connectionState === "live" ? "is-live" : ""}`} />
+        <strong>{streamStatusLabel(connectionState, streamEnabled)}</strong>
+        <span>{streamEnabled ? "Redpanda/Redis analytics mode" : "Synthetic local monitoring mode"}</span>
       </section>
       <section className="filters monitoring-filters">
         <label>
           Synthetic Demo Scenario
-          <select value={scenario} onChange={(event) => setScenario(event.target.value)}>
+          <select value={scenario} onChange={(event) => setScenario(event.target.value)} disabled={streamEnabled}>
             {scenarios.map((item) => (
               <option key={item} value={item}>{scenarioLabels[item] || item}</option>
             ))}
           </select>
-          <span>Demonstration using generated payment-stream data.</span>
+          <span>{streamEnabled ? "Scenario selection is disabled while reading live merchant state." : "Demonstration using generated payment-stream data."}</span>
         </label>
       </section>
       <section className="metrics-grid">
