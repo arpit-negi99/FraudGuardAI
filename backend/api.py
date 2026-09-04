@@ -71,8 +71,8 @@ async def health() -> dict:
 
 
 @app.get("/demo/transactions")
-def demo_transactions() -> dict:
-    return {"transactions": fraud_service.demo_predictions()}
+def demo_transactions(include_top_signal: bool = Query(default=False)) -> dict:
+    return {"transactions": fraud_service.demo_predictions(include_top_signal=include_top_signal)}
 
 
 @app.get("/demo/transactions/{transaction_id}")
