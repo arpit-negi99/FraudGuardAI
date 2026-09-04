@@ -152,6 +152,60 @@ Backend health check:
 http://localhost:8000/health
 ```
 
+## Deploy
+
+Recommended hackathon deployment:
+
+```text
+Backend: Render
+Frontend: Vercel
+Streaming mode: local
+External API keys: none
+```
+
+### Backend On Render
+
+Create a new Render Blueprint or Web Service from this repository.
+
+If using the included `render.yaml`, Render can read:
+
+```text
+Build Command: pip install -r requirements.txt
+Start Command: python -m uvicorn backend.api:app --host 0.0.0.0 --port $PORT
+```
+
+Environment:
+
+```text
+RISK_STREAM_MODE=local
+CORS_ALLOWED_ORIGINS=*
+```
+
+After deploy, verify:
+
+```text
+https://your-render-service.onrender.com/health
+```
+
+### Frontend On Vercel
+
+Create a Vercel project with:
+
+```text
+Root Directory: frontend
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm install
+```
+
+Set this frontend environment variable to your Render backend URL:
+
+```text
+VITE_API_BASE_URL=https://your-render-service.onrender.com
+```
+
+Redeploy the frontend after setting the environment variable.
+
 ## Score A New Transaction
 
 Open the **Transactions** page and use **Score New Transaction**.

@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-from backend.config import get_settings
+from backend.config import get_cors_origins, get_settings
 from backend.schemas import (
     BatchPredictionRequest,
     MonitoringEvaluationRequest,
@@ -23,12 +23,7 @@ app = FastAPI(title="FraudGuard AI API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:4173",
-        "http://127.0.0.1:4173",
-    ],
+    allow_origins=get_cors_origins(),
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],

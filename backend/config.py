@@ -5,6 +5,12 @@ from dataclasses import dataclass
 
 
 VALID_STREAM_MODES = {"local", "stream"}
+DEFAULT_CORS_ORIGINS = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+)
 
 
 @dataclass(frozen=True)
@@ -55,6 +61,19 @@ def get_settings() -> StreamingSettings:
         sse_heartbeat_seconds=_positive_int("RISK_SSE_HEARTBEAT_SECONDS", 10),
         default_merchant_id=_env_text("RISK_DEFAULT_MERCHANT_ID", "merchant_demo_001"),
     )
+
+
+def get_cors_origins() -> list[str]:
+    """Read browser origins allowed to call the FastAPI backend."""
+    raw = os.getenv("CORS_ALLOWED_ORIGINS", "").strip()
+    if not raw:
+        return list(DEFAULT_CORS_ORIGINS)
+    if raw == "*":
+        return ["*"]
+    origins = [item.strip().rstrip("/") for item in raw.split(",") if item.strip()]
+    if not origins:
+        raise ValueError("CORS_ALLOWED_ORIGINS must be '*' or a comma-separated list of origins.")
+    return origins
 
 
 def _env_text(name: str, default: str) -> str:

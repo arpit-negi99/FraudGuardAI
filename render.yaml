@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: fraudguard-ai-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn backend.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: RISK_STREAM_MODE
+        value: local
+      - key: CORS_ALLOWED_ORIGINS
+        value: "*"
