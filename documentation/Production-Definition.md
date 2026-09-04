@@ -190,7 +190,7 @@ All exceptions shown to end users should be concise; detailed stack traces belon
 
 React + Vite frontend with a lightweight FastAPI backend.
 
-Streamlit may remain available as a fallback/debug interface, but it is no longer the primary client-facing deployment target after the React migration.
+The supported deployment target is React + FastAPI.
 
 ## Dependencies
 
@@ -202,7 +202,7 @@ Pin tested versions before final deployment for at least:
 - scikit-learn,
 - XGBoost,
 - SHAP,
-- Streamlit,
+- FastAPI,
 - joblib or equivalent serializer.
 
 ## Model storage

@@ -20,7 +20,7 @@ Primary UI: React.
 
 Backend: FastAPI.
 
-Legacy/prototyping UI: Streamlit in `app.py`.
+The runnable demo surface is React + FastAPI only.
 
 ## Module 1
 

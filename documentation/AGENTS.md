@@ -190,7 +190,7 @@ Preferred sequence:
 - A notebook may be used for EDA, but production training/evaluation must be callable from scripts/modules.
 - Do not hardcode absolute local file paths.
 - Do not hardcode metric results into the app.
-- Never trigger training from the Streamlit UI.
+- Never trigger training from the demo UI.
 
 ---
 
@@ -215,7 +215,7 @@ Approved:
 - scikit-learn,
 - XGBoost,
 - SHAP,
-- Streamlit,
+- React + FastAPI,
 - simple local artifacts.
 
 Not approved for P0/P1:

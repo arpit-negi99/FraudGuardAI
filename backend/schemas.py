@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 class TransactionRequest(BaseModel):
     transaction: dict[str, Any]
-    include_explanation: bool = True
+    include_explanation: bool = False
 
 
 class BatchPredictionRequest(BaseModel):

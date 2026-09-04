@@ -176,7 +176,7 @@ All implementation-facing docs support one lightweight architecture:
 
 - Python,
 - in-process inference,
-- Streamlit demo,
+- React + FastAPI demo,
 - no separate backend required,
 - no raw dataset in deployment.
 
@@ -295,6 +295,6 @@ Never cut:
 
 The approved MVP specification is:
 
-> **A CPU-friendly XGBoost online-transaction fraud detector trained on a leakage-safe chronological split of IEEE-CIS data, compared with a logistic baseline, using validation-selected cost-aware review thresholding, SHAP explanations, held-out precision/recall evaluation, and a lightweight Streamlit demo.**
+> **A CPU-friendly XGBoost online-transaction fraud detector trained on a leakage-safe chronological split of IEEE-CIS data, compared with a logistic baseline, using validation-selected cost-aware review thresholding, SHAP explanations, held-out precision/recall evaluation, and a lightweight React + FastAPI demo.**
 
 Implementation should not start until this specification is approved.

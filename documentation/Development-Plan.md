@@ -117,7 +117,7 @@ A raw transaction can go through:
 
 ## Goals
 
-Build minimal Streamlit interface:
+Build minimal React + FastAPI interface:
 
 1. Single Transaction.
 2. Batch CSV.
@@ -202,7 +202,7 @@ Model is stable enough that further tuning has lower value than demo/reliability
 
 ## Deliverables
 
-- demo-ready Streamlit UI,
+- demo-ready React UI,
 - no fake metrics,
 - no offensive features.
 
@@ -221,7 +221,7 @@ A 3–5 minute demo tells one clear story:
 - Run unit/data/model/integration tests.
 - Benchmark latency/memory.
 - Pin dependencies.
-- Deploy Streamlit app.
+- Deploy React frontend and FastAPI backend.
 - Smoke test deployed flows.
 - Fix packaging/model-load issues.
 

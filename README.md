@@ -1,29 +1,50 @@
 # FraudGuard AI
 
-FraudGuard AI is a defense-only merchant risk operations demo. It combines transaction fraud scoring, payment lifecycle incident detection, and operational spike monitoring in a React + FastAPI application.
+**AI-powered fraud-risk decision support for merchant payments**
 
-The product is frozen for submission preparation. The frozen fraud threshold is `0.60`.
+FraudGuard AI helps merchants identify risky transactions before they turn into fraud losses, chargebacks, refund disputes, or unnecessary manual-review cost. It scores each transaction with a frozen machine-learning model, applies a locked review threshold, and gives the risk team a clear `ALLOW` or `REVIEW` recommendation.
 
-## What It Does
+The system is strictly defense-only. It does not generate fraud tactics, bypass controls, auto-block payments, issue refunds, or connect to real payment-provider infrastructure.
 
-- Scores merchant transactions with a frozen XGBoost fraud-risk model.
-- Recommends `ALLOW` or `REVIEW`; it never automatically blocks payments.
-- Shows SHAP-based top contributors for transaction review.
-- Detects simulated payment lifecycle incidents with deterministic rules.
-- Monitors synthetic population-level risk spikes with rolling statistical windows.
-- Clearly separates real held-out fraud evaluation from synthetic Module 2 and Module 3 demonstrations.
+## Why This Matters
 
-## Modules
+Merchants lose money in two directions:
 
-| Module | Purpose | Data | Method |
-| --- | --- | --- | --- |
-| Module 1 | Transaction fraud risk | IEEE-CIS labeled training data | XGBoost + SHAP |
-| Module 2 | Payment lifecycle incidents | Synthetic payment-event data | Deterministic lifecycle rules |
-| Module 3 | Operational spike monitoring | Synthetic monitoring stream | Z-score + EWMA windows |
+- fraudulent transactions that are approved,
+- legitimate customers who are slowed down by unnecessary reviews.
 
-## Final Held-Out Module 1 Results
+FraudGuard AI is built around that tradeoff. It reports standard fraud metrics and business-facing cost signals so a risk manager can understand both fraud capture and false-positive burden.
 
-The held-out test split was opened only after validation-based model and threshold selection.
+## What The Product Does
+
+- Scores individual transactions using a frozen XGBoost fraud-risk model.
+- Converts the risk score into `ALLOW` or `REVIEW` using threshold `0.60`.
+- Shows SHAP-based model contributors for transaction review.
+- Supports batch scoring for CSV transaction files.
+- Provides a review queue sorted by highest risk.
+- Shows payment lifecycle incident signals using deterministic defensive rules.
+- Monitors operational risk spikes using rolling statistical windows.
+- Supports an optional local streaming demo with Redpanda, Redis, and Server-Sent Events.
+
+## AI/ML Approach
+
+The core detector is a supervised tabular fraud model trained on the IEEE-CIS Fraud Detection dataset.
+
+```text
+Transaction
+    -> Frozen preprocessing
+    -> XGBoost fraud-risk model
+    -> Risk score
+    -> Threshold 0.60
+    -> ALLOW / REVIEW
+    -> SHAP explanation
+```
+
+The frontend does not calculate fraud decisions. React sends transaction inputs to the FastAPI backend, and the backend uses the saved preprocessing and model artifacts.
+
+## Measured Held-Out Results
+
+The final chronological held-out test split was evaluated only after model and threshold selection.
 
 | Metric | Value |
 | --- | ---: |
@@ -34,46 +55,148 @@ The held-out test split was opened only after validation-based model and thresho
 | ROC-AUC | 0.891247 |
 | Review rate | 0.053838 |
 
-## Runtime Architecture
+Threshold `0.60` was selected from validation analysis before final test evaluation. It remains frozen for the demo.
+
+## Cost-Aware Decisioning
+
+The project evaluates more than model accuracy. It tracks:
+
+- false positives,
+- missed fraud cases,
+- review workload,
+- modeled false-positive cost,
+- modeled missed-fraud cost.
+
+Cost values are scenario estimates, not claimed merchant savings.
+
+## Application Architecture
 
 ```text
-React + Vite UI
+React + Vite frontend
     |
 FastAPI backend
     |
-    +-- Module 1: frozen XGBoost + preprocessor + SHAP
-    +-- Module 2: payment lifecycle rules
-    +-- Module 3: statistical monitoring
+Frozen XGBoost inference pipeline
+    |
+Risk score + ALLOW/REVIEW + explanation
 ```
 
-Streamlit remains available in `app.py` as a fallback/debug UI. The React frontend is the primary submission UI.
+Optional streaming architecture:
 
-## Local Setup
-
-```bash
-python -m pip install -r requirements.txt
-cd frontend
-npm install
+```text
+FastAPI prediction event
+    -> bounded async queue
+    -> Redpanda topic
+    -> analytics worker
+    -> Redis merchant risk state
+    -> SSE live updates
+    -> Risk Monitor UI
 ```
+
+Local mode is the default and does not require Redpanda or Redis.
+
+## Repository Structure
+
+```text
+backend/              FastAPI app and service layer
+frontend/             React + Vite client
+src/                  data, inference, models, evaluation, monitoring logic
+scripts/              reproducible pipeline and demo scripts
+artifacts/            frozen model, preprocessor, results, demo rows
+configs/              project configuration
+documentation/        architecture, evaluation, and project notes
+tests/                Python regression tests
+```
+
+## Requirements
+
+No external API keys are required for normal runtime.
+
+Core runtime uses local artifacts:
+
+- `artifacts/models/xgboost_model.json`
+- `artifacts/preprocessors/preprocessor.joblib`
+- `artifacts/preprocessors/preprocessing_metadata.json`
+- `artifacts/demo/demo_transactions.csv`
+- `artifacts/demo/demo_labels.csv`
+
+Raw IEEE-CIS CSV files are not required to launch the demo.
 
 ## Run Locally
 
-Backend:
+From the repository root:
 
-```bash
+```powershell
+cd D:\fraudguard-ai
+.\.venv\Scripts\Activate.ps1
 python -m uvicorn backend.api:app --reload --port 8000
 ```
 
-Frontend:
+In a second terminal:
 
-```bash
-cd frontend
+```powershell
+cd D:\fraudguard-ai\frontend
+npm install
 npm run dev
 ```
 
-Default frontend URL: `http://localhost:5173`
+Open:
 
-The frontend can read `VITE_API_BASE_URL`; see `frontend/.env.example`.
+```text
+http://localhost:5173
+```
+
+Backend health check:
+
+```text
+http://localhost:8000/health
+```
+
+## Score A New Transaction
+
+Open the **Transactions** page and use **Score New Transaction**.
+
+The form submits to:
+
+```text
+POST /predict
+```
+
+The result shown in the UI is produced by the backend model pipeline. If the manually entered row does not include every IEEE-CIS feature, the backend fills absent model features as missing values and reports that in technical warnings.
+
+## Optional Streaming Demo
+
+Streaming is optional. Start with normal local mode unless you specifically want live risk-monitor updates.
+
+```powershell
+docker compose -f docker-compose.streaming.yml up -d
+```
+
+Run the backend in stream mode:
+
+```powershell
+$env:RISK_STREAM_MODE="stream"
+python -m uvicorn backend.api:app --reload --port 8000
+```
+
+Run the analytics worker:
+
+```powershell
+$env:RISK_STREAM_MODE="stream"
+python workers/risk_analytics_worker.py
+```
+
+Replay demo events:
+
+```powershell
+python scripts/replay_stream_demo.py --scenario mixed_spike --events-per-second 5 --count 100
+```
+
+The Risk Monitor can then receive updates through:
+
+```text
+GET /monitoring/stream
+```
 
 ## Key API Endpoints
 
@@ -89,44 +212,58 @@ The frontend can read `VITE_API_BASE_URL`; see `frontend/.env.example`.
 - `GET /incidents/lifecycles`
 - `GET /incidents/lifecycles/{payment_id}`
 - `GET /monitoring/current`
+- `GET /monitoring/stream`
 - `GET /monitoring/scenarios`
-
-## Demo Guide
-
-Use [documentation/DEMO-FLOW.md](documentation/DEMO-FLOW.md) for the 5-minute walkthrough.
-
-Screenshots should be captured after final visual review and stored in `documentation/screenshots/`.
 
 ## Tests
 
 Python:
 
-```bash
+```powershell
 python -m pip check
 python -m pytest -q
 ```
 
 Frontend:
 
-```bash
+```powershell
 cd frontend
 npm test
 npm run build
 ```
 
-## Dataset Safety
+## Demo Flow
 
-Raw IEEE-CIS CSV files live under `data/raw/` and are intentionally ignored by Git. They are not required for normal demo runtime. Do not commit the raw Kaggle dataset.
+1. Start the FastAPI backend and React frontend.
+2. Open the Dashboard to show overall risk workload.
+3. Go to Transactions and score a new transaction.
+4. Open a high-risk transaction and show the SHAP contributors.
+5. Use Review Queue to show how risky transactions are prioritized.
+6. Open Policy to explain the frozen threshold and what-if cost analysis.
+7. Open Risk Monitor to show rolling operational risk signals.
+
+See [documentation/DEMO-FLOW.md](documentation/DEMO-FLOW.md) for the full walkthrough.
+
+## Dataset And Safety Notes
+
+The training dataset is IEEE-CIS Fraud Detection. Raw files under `data/raw/` are ignored by Git and should not be committed.
+
+The dataset is historical and anonymized. It is suitable for an MVP benchmark, not a guarantee of production performance on a specific merchant or region.
 
 ## Limitations
 
-- Fraud scores are model risk scores, not guaranteed calibrated probabilities.
-- Held-out recall is 0.563088 at threshold `0.60`.
-- IEEE-CIS features are anonymized and historical.
-- Cost simulations use assumptions, not measured merchant savings.
-- Module 2 and Module 3 use synthetic data for demonstration.
-- No real payment-provider credentials, webhooks, refunds, chargebacks, or payment actions are included.
+- Fraud scores are risk scores, not calibrated real-world probabilities.
+- The held-out recall at threshold `0.60` is `0.563088`.
+- Cost analysis uses assumptions, not real merchant accounting data.
+- Payment lifecycle and monitoring data are synthetic/demo data.
+- The system recommends `ALLOW` or `REVIEW`; it does not auto-block payments.
+- There is no real Razorpay, bank, webhook, refund, or chargeback integration.
+- No LLM, RAG, embeddings, or external model API is used.
 
-## Frozen System Notes
+## Project Documentation
 
-See [documentation/FROZEN-SYSTEM.md](documentation/FROZEN-SYSTEM.md) for the artifact audit, freeze rules, and module boundaries.
+- [Frozen System](documentation/FROZEN-SYSTEM.md)
+- [AI/ML Architecture](documentation/AI-ML-Architecture.md)
+- [Evaluation](documentation/ML-Evaluation.md)
+- [Streaming Architecture](documentation/Streaming-Architecture.md)
+- [Demo Flow](documentation/DEMO-FLOW.md)

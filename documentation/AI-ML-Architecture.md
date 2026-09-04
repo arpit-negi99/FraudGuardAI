@@ -35,7 +35,7 @@ Freeze model + preprocessor + threshold + metadata
         ↓
 Untouched temporal test evaluation
         ↓
-Streamlit demo / batch scorer
+React demo / batch scorer
         ↓
 Risk score + ALLOW/REVIEW + SHAP drivers
 ```
@@ -309,7 +309,7 @@ The test set itself is not packaged into the deployed app.
 
 Use a lightweight **FastAPI** application that imports the frozen inference pipeline in-process.
 
-The React frontend is the primary client-facing submission UI. Streamlit may remain available only as a fallback/debug interface.
+The React frontend is the supported client-facing submission UI.
 
 ### Why
 
@@ -391,7 +391,7 @@ flowchart TD
     N --> O
     O --> P[Metrics + Cost Report]
 
-    N --> Q[Streamlit Demo]
+    N --> Q[React Demo]
     R[Single Transaction / CSV] --> Q
     Q --> S[Fraud Risk Score]
     S --> T[ALLOW / REVIEW]

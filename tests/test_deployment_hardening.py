@@ -7,8 +7,9 @@ from pathlib import Path
 import pandas as pd
 from sklearn.exceptions import InconsistentVersionWarning
 
-from app import DEFAULT_THRESHOLD, missing_deployment_artifacts
+from backend.deployment import missing_deployment_artifacts
 from src.inference.predict import (
+    DEFAULT_THRESHOLD,
     DEFAULT_MODEL_PATH,
     DEFAULT_PREPROCESSOR_PATH,
     FraudPredictor,
@@ -58,17 +59,17 @@ def test_demo_sample_exists_without_inference_labels() -> None:
 
 
 def test_standard_inference_does_not_require_raw_training_data() -> None:
-    app_text = Path("app.py").read_text(encoding="utf-8")
+    api_text = Path("backend/api.py").read_text(encoding="utf-8")
     demo_script_text = Path("scripts/demo_inference.py").read_text(encoding="utf-8")
 
-    assert "load_labeled_data" not in app_text
-    assert "chronological_split" not in app_text
+    assert "load_labeled_data" not in api_text
+    assert "chronological_split" not in api_text
     assert "load_labeled_data" not in demo_script_text
     assert "chronological_split" not in demo_script_text
 
 
-def test_app_helper_paths_are_relative() -> None:
-    tree = ast.parse(Path("app.py").read_text(encoding="utf-8"))
+def test_runtime_helper_paths_are_relative() -> None:
+    tree = ast.parse(Path("backend/deployment.py").read_text(encoding="utf-8"))
     path_strings = [
         node.value
         for node in ast.walk(tree)
@@ -83,7 +84,7 @@ def test_no_external_model_api_key_is_required() -> None:
     requirement_text = Path("requirements-lock.txt").read_text(encoding="utf-8").lower()
     source_text = "\n".join(
         path.read_text(encoding="utf-8")
-        for path in [Path("app.py"), Path("src/inference/predict.py")]
+        for path in [Path("backend/api.py"), Path("src/inference/predict.py")]
     ).lower()
 
     assert "openai" not in requirement_text

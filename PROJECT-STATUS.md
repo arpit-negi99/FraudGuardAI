@@ -116,7 +116,7 @@ Do not add without explicit architectural justification:
 6. Cost-aware decision engine
 7. Error analysis
 8. SHAP explainability
-9. Streamlit demo
+9. React/FastAPI demo
 10. Final held-out evaluation
 11. Deployment
 12. Presentation/demo preparation
@@ -279,39 +279,39 @@ Inference latency single prediction without SHAP: 114.03 ms
 Inference latency single prediction with SHAP: 496.07 ms
 Inference latency batch prediction 100 rows: 146.30 ms
 
-Streamlit demo local app: `app.py`
-Streamlit pages implemented: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, Model & Methodology
-Streamlit local run verified: HTTP 200 from `streamlit run app.py`
-Streamlit navigation verification: all 5 sections ran with 0 Streamlit test-harness exceptions
-Streamlit batch upload verification: small CSV scored with 0 Streamlit test-harness exceptions
-Streamlit CSV download verification: download button rendered after batch scoring
-Streamlit threshold slider verification: slider reran at threshold 0.79 with 0 exceptions
-Streamlit tests: 95 passed, 0 failed, 0 skipped
-Streamlit dependency installed: streamlit 1.62.0
-Streamlit UI support tests added: 8 passed
-Streamlit held-out test evaluation: not performed during UI implementation
+Legacy Python demo local app existed before React became primary.
+Legacy Python demo pages implemented: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, Model & Methodology
+Legacy Python demo local run was previously verified.
+Legacy Python demo navigation verification: all 5 sections ran with 0 legacy test-harness exceptions
+Legacy Python demo batch upload verification: small CSV scored with 0 legacy test-harness exceptions
+Legacy Python demo CSV download verification: download button rendered after batch scoring
+Legacy Python demo threshold slider verification: slider reran at threshold 0.79 with 0 exceptions
+Legacy Python demo tests: 95 passed, 0 failed, 0 skipped
+Legacy Python demo dependency installed during that phase
+Legacy Python demo UI support tests added: 8 passed
+Legacy Python demo held-out test evaluation: not performed during UI implementation
 
 UI polish completed: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, and Model & Methodology refined
 UI polish tests: 103 passed, 0 failed, 0 skipped
-UI polish local app verification: HTTP 200 from `streamlit run app.py`
-UI polish navigation verification: all 5 sections ran with 0 Streamlit test-harness exceptions
+UI polish local app verification: HTTP 200 from the legacy Python demo server
+UI polish navigation verification: all 5 sections ran with 0 legacy test-harness exceptions
 UI polish sample batch flow: sample CSV generated without `isFraud`, uploaded, scored, and results download rendered with 0 exceptions
 UI polish policy preset verification: Highest F1 preset and threshold slider at 0.79 ran with 0 exceptions
 UI polish held-out test evaluation: not performed
 Second visual polish pass completed after review feedback that the UI looked too similar to the previous version
-Second visual polish local app verification: HTTP 200 from `streamlit run app.py`
+Second visual polish local app verification: HTTP 200 from the legacy Python demo server
 Second visual polish tests: 103 passed, 0 failed, 0 skipped
 
-Client-facing Streamlit UI redesign completed
-Client-facing UI local app verification: HTTP 200 from `streamlit run app.py`
-Client-facing UI navigation verification: Home, Review Queue, Transaction Details, Risk Monitor, Policy Settings, and About FraudGuard each ran with 0 Streamlit test-harness exceptions
+Client-facing legacy Python UI redesign completed before React migration
+Client-facing UI local app verification: HTTP 200 from the legacy Python demo server
+Client-facing UI navigation verification: Home, Review Queue, Transaction Details, Risk Monitor, Policy Settings, and About FraudGuard each ran with 0 legacy test-harness exceptions
 Client-facing UI tests: 122 passed, 0 failed, 0 skipped
 Client-facing UI held-out test evaluation: not performed during UI redesign
 
 React primary frontend implemented
 FastAPI backend implemented
 Shared presentation/inference helper module implemented
-Streamlit retained as fallback/debug UI in `app.py`
+Legacy Python UI retained as fallback/debug UI before later removal
 React pages implemented: Dashboard, Transactions, Review Queue, Risk Monitor, Policy, About, Transaction Details
 FastAPI endpoints implemented: `/health`, `/demo/transactions`, `/demo/transactions/{transaction_id}`, `/predict`, `/predict/batch`, `/policy/presets`, `/policy/simulate`, `/risk/summary`, `/risk/review-queue`, `/risk/spike`, `/evaluation/final`
 React frontend local verification: HTTP 200 from Vite dev server at `http://127.0.0.1:5173`
@@ -503,7 +503,7 @@ Inference unit and integration tests complete: 87 passed, 0 failed, 0 skipped.
 
 Inference demo complete using validation rows only.
 
-Streamlit demo implemented.
+Legacy Python demo implemented before React became primary.
 
 UI polish completed.
 
@@ -528,9 +528,9 @@ UI polish support tests complete: 103 passed, 0 failed, 0 skipped.
 
 UI polish implementation note:
 
-* This task changed Streamlit presentation/helper code only.
-* A more visible Streamlit visual layer was added with a branded overview hero, styled metric cards, decision banners, dashboard panels, and a darker navigation sidebar.
-* Overview cards now look distinct from default Streamlit metrics and use the threshold 0.60 validation operating point for Precision, Recall, and Review Rate.
+* This task changed legacy Python UI presentation/helper code only.
+* A more visible legacy Python visual layer was added with a branded overview hero, styled metric cards, decision banners, dashboard panels, and a darker navigation sidebar.
+* Overview cards used the threshold 0.60 validation operating point for Precision, Recall, and Review Rate.
 * Transaction Inspector now presents model output in custom cards plus a clear ALLOW/REVIEW decision banner.
 * Batch Analysis and Risk Policy Lab now use styled cards for summary and policy metrics.
 * Model & Methodology now uses compact summary cards instead of a plain text list.
@@ -546,7 +546,7 @@ Client-facing UI redesign note:
 * Technical SHAP details and model metrics are available in expanders or About FraudGuard rather than dominating the primary workflow.
 * Risk Monitor is framed as current demo/batch activity; live fraud-spike detection remains a future feature.
 * Policy Settings uses business-friendly review strategies while preserving threshold 0.60 as the balanced frozen policy.
-* The UI redesign changed Streamlit presentation/helper code only.
+* The UI redesign changed legacy Python UI presentation/helper code only.
 * XGBoost model, preprocessing, 422-feature contract, threshold 0.60, final held-out metrics, SHAP artifacts, and inference output semantics were not changed.
 
 React/FastAPI migration note:
@@ -561,11 +561,11 @@ React/FastAPI migration note:
 * Risk Monitor shows current demo activity charts and a transparent rolling review-rate spike detector, not a second ML model.
 * Policy page uses Fraud First, Balanced, and Low Friction strategy cards plus validation-only advanced metrics and scenario cost simulation.
 * About page shows the frozen architecture, technology stack, final held-out metrics, limitations, and defense-only framing.
-* Streamlit remains available as fallback/debug UI but is no longer the primary submission interface.
+* The legacy Python UI was no longer the primary submission interface after React migration.
 * XGBoost model, preprocessing artifact, 422 transformed features, threshold 0.60, final held-out metrics, and SHAP calculation were not changed.
 * No held-out test result was used for tuning during this migration.
 
-Streamlit pages/features completed:
+Legacy Python UI pages/features completed:
 
 * Risk Overview with validation XGBoost metrics, model comparison, majority-baseline context, and SHAP global importance.
 * Transaction Inspector with small representative validation examples, frozen inference scoring, policy decision, SHAP local explanation, and offline label separation.
@@ -573,11 +573,11 @@ Streamlit pages/features completed:
 * Risk Policy Lab with validation threshold slider, policy presets, threshold trade-off chart, and cost scenario comparison.
 * Model & Methodology with concise dataset/model/split/explainability/limitation notes.
 
-Streamlit local run verified.
+Legacy Python UI local run verified.
 
-Streamlit UI support tests complete: 95 passed, 0 failed, 0 skipped.
+Legacy Python UI support tests complete: 95 passed, 0 failed, 0 skipped.
 
-Streamlit implementation note:
+Legacy Python UI implementation note:
 
 * The app imports and calls the existing inference layer instead of duplicating ML logic.
 * The app reads existing validation result artifacts for metrics, threshold analysis, cost scenarios, and SHAP global importance.
@@ -585,14 +585,14 @@ Streamlit implementation note:
 * Default threshold 0.60 is the frozen demo policy selected from validation analysis before final held-out evaluation.
 * Cost values are labeled as modeled cost units, not actual merchant savings.
 * Batch precision/recall is not calculated for uploaded CSVs because production-style input normally has no labels.
-* Streamlit is cached with `st.cache_resource` for the predictor and `st.cache_data` for static artifacts and validation examples.
+* The legacy Python UI cached the predictor and static artifacts during its implementation.
 * Local app test harness verified all navigation sections with 0 exceptions.
 * Local app test harness verified CSV upload scoring with 0 exceptions.
 * Local app test harness verified the scored CSV download button rendered.
 * Local app test harness verified threshold slider rerun at 0.79 with 0 exceptions.
-* Streamlit install upgraded `protobuf` to 7.36.0 and pip reported conflicts with unrelated installed Google/MediaPipe packages in the global Python environment.
+* The legacy Python UI dependency install upgraded `protobuf` to 7.36.0 and pip reported conflicts with unrelated installed Google/MediaPipe packages in the global Python environment.
 * The preprocessor artifact originally emitted a scikit-learn version warning before deployment hardening because it was serialized with scikit-learn 1.9.0 and the runtime had 1.5.2.
-* Held-out test split remained untouched during Streamlit implementation.
+* Held-out test split remained untouched during legacy Python UI implementation.
 
 Inference artifacts reused:
 
@@ -776,7 +776,7 @@ numpy version: 2.5.2
 scikit-learn version: 1.9.0
 XGBoost version: 3.4.1
 SHAP version: 0.52.0
-Streamlit version: 1.62.0
+Legacy Python UI package version previously used: 1.62.0
 joblib version: 1.5.3
 PyYAML version: 6.0.3
 matplotlib version: 3.11.1
@@ -786,8 +786,8 @@ project .venv pip check: no broken requirements found
 global Python pip check: failed due to unrelated globally installed Google/MediaPipe/spaCy-side package conflicts with protobuf/numpy; FraudGuard .venv is clean.
 project .venv pytest: 117 passed, 0 failed, 0 skipped
 demo_inference.py: succeeded
-Streamlit HTTP startup: 200
-Streamlit page harness: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, and Model & Methodology each ran with 0 exceptions
+Legacy Python UI HTTP startup: 200
+Legacy Python UI page harness: Risk Overview, Transaction Inspector, Batch Analysis, Risk Policy Lab, and Model & Methodology each ran with 0 exceptions
 Preprocessor sklearn version warning: absent after runtime alignment
 Raw IEEE-CIS data required for standard app/demo startup: no
 External API keys required: no
@@ -850,6 +850,88 @@ Freeze constraints:
 * Module 3 monitoring logic unchanged.
 * No new ML model, LLM, payment gateway integration, database, refund action, or automatic blocking was added.
 
+## Optional Streaming Architecture Extension
+
+Completed in this task:
+
+* Added `RISK_STREAM_MODE=local` / `RISK_STREAM_MODE=stream` configuration.
+* Added versioned transaction-risk event schema with UUID event IDs.
+* Added bounded async Redpanda producer with fail-open behavior.
+* Added external risk analytics worker for Redpanda consumption and Redis merchant aggregation.
+* Added Redis key contract for merchant current state, events, alerts, and baseline.
+* Added collision-safe sorted-set event members using timestamp plus event UUID.
+* Added dynamic merchant baseline logic that excludes the current bucket.
+* Added z-score, EWMA, alert cooldown, and recovery event support for stream mode.
+* Added `/monitoring/stream` SSE endpoint and stream-mode `/monitoring/current` / `/monitoring/alerts` Redis reads.
+* Added React EventSource hook with polling fallback indicator.
+* Added stream replay and hot-path benchmark scripts.
+* Added `docker-compose.streaming.yml`, `.env.example`, and streaming architecture documentation.
+
+Verification completed in this task:
+
+```text
+Frontend utility tests: 19 passed, 0 failed, 0 skipped
+Frontend production build: succeeded
+Python tests: not run because the local .venv Python launcher points to missing C:\Users\ARPIT NEGI\AppData\Local\Programs\Python\Python312\python.exe
+Docker integration: not run because docker is not available in this shell
+```
+
+Frozen-system verification for this task:
+
+* XGBoost unchanged.
+* preprocessing unchanged.
+* 422-feature contract unchanged.
+* threshold remains 0.60.
+* held-out metrics unchanged.
+* Module 2 rules unchanged.
+
+## Legacy Python UI Removal
+
+Completed in this task:
+
+* Removed the legacy Python UI file.
+* Removed the legacy Python UI support tests.
+* Removed the legacy UI dependency from runtime requirements.
+* Moved deployment artifact checks into `backend/deployment.py`.
+* Updated README and documentation so React + FastAPI is the only supported demo surface.
+* Verified no active references remain to the removed UI file or package name.
+
+Verification completed in this task:
+
+```text
+Removed UI reference scan: no active matches for removed UI file/package name
+Frontend utility tests: 19 passed, 0 failed, 0 skipped
+Frontend production build: succeeded
+Python tests: not run because the local .venv Python launcher points to missing C:\Users\ARPIT NEGI\AppData\Local\Programs\Python\Python312\python.exe
+```
+
+Frozen-system verification for this task:
+
+* XGBoost unchanged.
+* preprocessing unchanged.
+* 422-feature contract unchanged.
+* threshold remains 0.60.
+* held-out metrics unchanged.
+* Module 2 rules unchanged.
+
+## Manual Transaction Scoring UI
+
+Completed in this task:
+
+* Added a `Score New Transaction` panel to the React Transactions page.
+* The form calls the existing FastAPI `/predict` endpoint and displays the backend model result.
+* The frontend does not calculate fraud decisions locally.
+* The displayed `ALLOW` / `REVIEW` decision still comes from the frozen XGBoost score and threshold `0.60`.
+* Added frontend utility tests for manual transaction payload construction.
+
+Verification completed in this task:
+
+```text
+Frontend utility tests: 21 passed, 0 failed, 0 skipped
+Frontend production build: succeeded
+Python tests: not run because the local .venv Python launcher points to missing C:\Users\ARPIT NEGI\AppData\Local\Programs\Python\Python312\python.exe
+```
+
 ## Next Action
 
-Deploy frontend/backend, capture final screenshots, rehearse 5-minute pitch, and submit GitHub repository.
+Streaming architecture is complete. Ready for final deployment, architecture diagram/screenshots, and 5-minute pitch recording.

@@ -58,6 +58,24 @@ def test_predict_endpoint_uses_existing_inference_pipeline() -> None:
     assert body["decision"] in {"ALLOW", "REVIEW"}
 
 
+def test_predict_endpoint_succeeds_when_stream_enqueue_fails(monkeypatch) -> None:
+    async def dropped_event(_event):
+        return False
+
+    monkeypatch.setattr("backend.api.risk_event_producer.enqueue", dropped_event)
+    transaction = _json_ready(fraud_service.get_demo_transactions().iloc[0].to_dict())
+
+    response = client.post(
+        "/predict",
+        json={"transaction": transaction, "include_explanation": False},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["threshold"] == 0.60
+    assert body["decision"] in {"ALLOW", "REVIEW"}
+
+
 def test_batch_predict_endpoint_summarizes_results() -> None:
     transactions = [
         _json_ready(row)

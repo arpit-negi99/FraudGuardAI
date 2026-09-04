@@ -255,7 +255,7 @@ Python.
 
 React + Vite is the primary client-facing UI.
 
-Streamlit remains a fallback/debug interface and must not be treated as the primary submission frontend.
+React + FastAPI is the supported submission frontend/backend.
 
 ### Experiment tracking
 

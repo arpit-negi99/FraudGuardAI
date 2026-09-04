@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
+from backend.config import get_settings
 from backend.schemas import (
     BatchPredictionRequest,
     MonitoringEvaluationRequest,
@@ -11,7 +13,9 @@ from backend.schemas import (
     PolicySimulationRequest,
     TransactionRequest,
 )
-from backend.services import fraud_service, incident_service, monitoring_service
+from backend.services import fraud_service, incident_service, monitoring_service, streaming_monitor_service
+from backend.services.event_producer import producer as risk_event_producer
+from src.events.schema import build_transaction_event
 from src.inference.predict import ArtifactLoadError, InferenceError, InferenceInputError
 
 
@@ -31,13 +35,32 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+async def startup() -> None:
+    await risk_event_producer.start()
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    await risk_event_producer.stop()
+
+
 @app.get("/health")
-def health() -> dict:
+async def health() -> dict:
+    settings = get_settings()
+    stream_health = {
+        "stream_mode": settings.stream_mode,
+        "streaming_enabled": settings.streaming_enabled,
+        "redpanda": risk_event_producer.status(),
+        "redis": await streaming_monitor_service.redis_ping(settings),
+        "analytics_worker": "external",
+    }
     try:
         return {
             **fraud_service.health(),
             "incident_module_available": True,
             "monitoring_module_available": True,
+            **stream_health,
         }
     except ArtifactLoadError as exc:
         return {
@@ -47,6 +70,7 @@ def health() -> dict:
             "incident_module_available": True,
             "monitoring_module_available": True,
             "threshold": 0.60,
+            **stream_health,
             "message": str(exc),
         }
 
@@ -67,12 +91,15 @@ def demo_transaction(transaction_id: int) -> dict:
 
 
 @app.post("/predict")
-def predict(request: TransactionRequest) -> dict:
+async def predict(request: TransactionRequest) -> dict:
     try:
-        return fraud_service.score_transaction(
+        result = fraud_service.score_transaction(
             request.transaction,
             include_explanation=request.include_explanation,
         )
+        event = build_transaction_event(result, request.transaction, merchant_id=request.transaction.get("merchant_id"))
+        await risk_event_producer.enqueue(event)
+        return result
     except InferenceInputError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except InferenceError as exc:
@@ -145,7 +172,12 @@ def monitoring_windows(
 
 
 @app.get("/monitoring/current")
-def monitoring_current(scenario_type: str | None = None) -> dict:
+async def monitoring_current(
+    scenario_type: str | None = None,
+    merchant_id: str | None = None,
+) -> dict:
+    if get_settings().streaming_enabled:
+        return await streaming_monitor_service.current_state(merchant_id)
     try:
         return monitoring_service.current(scenario_type=scenario_type)
     except ValueError as exc:
@@ -153,10 +185,13 @@ def monitoring_current(scenario_type: str | None = None) -> dict:
 
 
 @app.get("/monitoring/alerts")
-def monitoring_alerts(
+async def monitoring_alerts(
     scenario_type: str | None = None,
+    merchant_id: str | None = None,
     limit: int = Query(default=50, ge=1, le=200),
 ) -> dict:
+    if get_settings().streaming_enabled:
+        return await streaming_monitor_service.recent_alerts(merchant_id, limit)
     try:
         return monitoring_service.alerts(scenario_type=scenario_type, limit=limit)
     except ValueError as exc:
@@ -166,6 +201,15 @@ def monitoring_alerts(
 @app.get("/monitoring/scenarios")
 def monitoring_scenarios() -> dict:
     return monitoring_service.scenarios()
+
+
+@app.get("/monitoring/stream")
+async def monitoring_stream(merchant_id: str | None = None) -> StreamingResponse:
+    return StreamingResponse(
+        streaming_monitor_service.sse_events(merchant_id),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.post("/monitoring/evaluate")
